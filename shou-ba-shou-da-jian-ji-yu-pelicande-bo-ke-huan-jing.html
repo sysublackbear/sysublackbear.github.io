@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh">
   <head>
-    <meta charset="utf-8" />
+        <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=endge, chrome=IE8" />
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no" />
-    <title>/usr/bin/sysublackbear — Categories</title>
+    <title>手把手搭建基于pelican的博客环境 — /usr/bin/sysublackbear</title>
     <!--[if lte IE 8]><script type="text/javascript" src="/theme/js/html5shiv.js"></script><![endif]-->
     <link rel="stylesheet" type="text/css" href="/theme/css/skeleton.css" />
     <link rel="stylesheet" type="text/css" href="/theme/css/theme.css" />
@@ -13,6 +13,10 @@
     <link rel="alternate" type="application/atom+xml"
                            title="/usr/bin/sysublackbear — Flux Atom"
                            href="/" /> 
+
+    <meta name="author"   content="sysublackbear" />
+    <meta name="keywords" content="blog, python" />
+    <link rel="stylesheet" media="not print" type="text/css" href="/theme/css/pygments.css" /> 
   </head>
   <body>
     <div id="page">
@@ -23,16 +27,34 @@
       </header>
       
       <div id="page-body">
-        <section id="page-main" role="main">
-    <section class="content">
-      <h1>Categories</h1>
-      <ul id="category-list">
-      <li><a href="/category/about.html">about</a> (1 articles)</li>
-      <li><a href="/category/misc.html">misc</a> (1 articles)</li>
-      <li><a href="/category/pelican.html">pelican</a> (1 articles)</li>
-      </ul>
-    </section>
-      </section> <!-- /#page-main -->
+        <article class="post" id="page-main" role="main">
+      <header class="post-header">
+        <h1>
+          <a rel="bookmark"
+             href="/shou-ba-shou-da-jian-ji-yu-pelicande-bo-ke-huan-jing.html"
+             title="Lien permanent vers «手把手搭建基于pelican的博客环境»">
+             手把手搭建基于pelican的博客环境
+          </a>
+        </h1>
+        <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-05-21T22:17:00+08:00">六 21 五月 2016</time><br />
+Categories: <a href="/category/pelican.html">pelican</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/blog.html">blog</a>,               <a rel="tag" href="/tag/python.html">python</a>        </div>
+      </header>
+      <div class="post-content"> 
+        <p>展示代码区块：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">argv</span>
+</pre></div>
+      </div>
+      <footer class="post-footer">
+        <div class="meta">
+          Article Categories: <a href="/category/pelican.html">pelican</a><br /> 
+          Author Articles: <a href="/author/sysublackbear.html">sysublackbear</a><br />
+          Article Tags:  #<a href="/tag/blog.html">blog</a> #<a href="/tag/python.html">python</a>        </div>
+      </footer>
+      </article> <!-- /#page-main -->
 
         <aside id="page-side">
           <!-- begin includes/sidebar.html -->
@@ -50,7 +72,7 @@
             <ul>
               <li><a href="/category/about.html">about</a></li>
               <li><a href="/category/misc.html">misc</a></li>
-              <li><a href="/category/pelican.html">pelican</a></li>
+              <li class="active"><a href="/category/pelican.html">pelican</a></li>
             </ul>
           </nav>
 
