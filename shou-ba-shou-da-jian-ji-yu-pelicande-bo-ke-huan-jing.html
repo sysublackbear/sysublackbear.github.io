@@ -97,6 +97,33 @@ pelicanBlog
 </pre></div>
 
 
+<p>我们进入output目录，把git的项目路径拉取下来。</p>
+<div class="highlight"><pre><span></span><span class="nb">cd</span> output
+git clone git@github.com:sysublackbear/sysublackbear.github.io.git
+</pre></div>
+
+
+<p>将拉下来的代码目录重命名为output。</p>
+<h2>3.开始写博文</h2>
+<p>博文支持markdown的方式去编写，然后通过发布来看效果。</p>
+<div class="highlight"><pre><span></span>make publish
+make serve
+</pre></div>
+
+
+<p>然后登陆<em>http://127.0.0.1:8000</em>，可以看到效果。</p>
+<p>如果我们想要一键发布到github，可以通过修改makefile文件来解决。</p>
+<div class="highlight"><pre><span></span>github: publish
+<span class="nb">cd</span> <span class="k">$(</span>OUTPUTDIR<span class="k">)</span> <span class="o">&amp;&amp;</span> git add . <span class="o">&amp;&amp;</span> git commit -am <span class="s2">&quot;update my blog content&quot;</span> <span class="o">&amp;&amp;</span> git push 
+</pre></div>
+
+
+<p>后续发布博客，可以直接：</p>
+<div class="highlight"><pre><span></span>make publish
+make github
+</pre></div>
+
+
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
     <span class="k">print</span> <span class="n">argv</span>
 </pre></div>
