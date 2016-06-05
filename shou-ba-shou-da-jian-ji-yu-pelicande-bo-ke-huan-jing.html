@@ -66,6 +66,37 @@ virtualenv --no-site-packages venv
 </pre></div>
 
 
+<p>然后安装<code>pelican</code>和<code>markdown</code></p>
+<div class="highlight"><pre><span></span>pip install pelican
+pip install markdown
+</pre></div>
+
+
+<h2>2.初始化pelican的环境</h2>
+<div class="highlight"><pre><span></span>mkdir blog
+<span class="nb">cd</span> blog
+pelican-quickstart
+</pre></div>
+
+
+<p>目录结构如下：</p>
+<div class="highlight"><pre><span></span>(pelicanvenv) ➜  PycharmProjects tree pelicanBlog -L  1
+pelicanBlog
+├── Makefile
+├── content
+├── fabfile.py
+├── output
+├── pelican-plugins
+├── pelican-themes
+├── pelicanconf.py
+├── pelicanconf.pyc
+├── pelicanvenv
+├── publishconf.py
+├── publishconf.pyc
+└── sysublackbear.github.io
+</pre></div>
+
+
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
     <span class="k">print</span> <span class="n">argv</span>
 </pre></div>
