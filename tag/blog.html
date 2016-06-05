@@ -50,6 +50,20 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
 </pre></div>
 
 
+<p>此外，为了单独为<code>pelican</code>环境进行一个单独的沙箱隔离，最后也安装一个沙箱环境：<code>virtualenv</code>。</p>
+<div class="highlight"><pre><span></span>$ pip install virtualenv
+</pre></div>
+
+
+<p>然后初始化沙箱环境</p>
+<div class="highlight"><pre><span></span>mkdir pelicanBlog
+<span class="nb">cd</span> pelicanBlog
+<span class="c1">#设定沙箱环境名字venv</span>
+virtualenv --no-site-packages venv
+<span class="nb">source</span> venv/bin/active
+</pre></div>
+
+
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
     <span class="k">print</span> <span class="n">argv</span>
 </pre></div>
