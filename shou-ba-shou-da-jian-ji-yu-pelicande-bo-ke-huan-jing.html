@@ -124,6 +124,44 @@ make github
 </pre></div>
 
 
+<h2>4.挑选主题</h2>
+<p>我所使用的是dev-random2这个主题，比较简洁的一个主题，后面我会把我的主题配置放到github里面，
+我定制化修改了一些东西。</p>
+<p>先下载安装主题包和插件包</p>
+<div class="highlight"><pre><span></span>git clone git://github.com/getpelican/pelican-themes.git
+git clone git://github.com/getpelican/pelican-plugins.git
+</pre></div>
+
+
+<p>主题包有用到，插件包暂时没有用，后面会陆续完善功能吧。</p>
+<p>当你进入pelican-themes目录后，可以进入你想要的主题目录去拉取最新的主题模板。
+可以在这里预览所有的<a href="http://www.pelicanthemes.com/">主题</a>。</p>
+<p>然后看一下pelican-themes的用法吧</p>
+<div class="highlight"><pre><span></span><span class="o">(</span>pelicanvenv<span class="o">)</span> ➜  content pelican-themes -h
+usage: pelican-themes <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-l <span class="p">|</span> -p <span class="p">|</span> -V<span class="o">]</span> <span class="o">[</span>-i theme path <span class="o">[</span>theme path ...<span class="o">]]</span>
+<span class="o">[</span>-r theme name <span class="o">[</span>theme name ...<span class="o">]]</span>
+<span class="o">[</span>-U theme path <span class="o">[</span>theme path ...<span class="o">]]</span>
+<span class="o">[</span>-s theme path <span class="o">[</span>theme path ...<span class="o">]]</span> <span class="o">[</span>-c<span class="o">]</span> <span class="o">[</span>-v<span class="o">]</span>
+
+Install themes <span class="k">for</span> Pelican
+optional arguments:
+-h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+-l, --list            Show the themes already installed and <span class="nb">exit</span>
+-p, --path            Show the themes path and <span class="nb">exit</span>
+-V, --version         Print the version of this script
+-i theme path <span class="o">[</span>theme path ...<span class="o">]</span>, --install theme path <span class="o">[</span>theme path ...<span class="o">]</span>
+The themes to install
+-r theme name <span class="o">[</span>theme name ...<span class="o">]</span>, --remove theme name <span class="o">[</span>theme name ...<span class="o">]</span>
+The themes to remove
+-U theme path <span class="o">[</span>theme path ...<span class="o">]</span>, --upgrade theme path <span class="o">[</span>theme path ...<span class="o">]</span>
+The themes to upgrade
+-s theme path <span class="o">[</span>theme path ...<span class="o">]</span>, --symlink theme path <span class="o">[</span>theme path ...<span class="o">]</span>
+Same as <span class="sb">`</span>--install<span class="err">&#39;</span>, but create a symbolic link instead of copying the theme. Useful <span class="k">for</span> theme development
+-c, --clean           Remove the broken symbolic links of the theme path
+-v, --verbose         Verbose output
+</pre></div>
+
+
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
     <span class="k">print</span> <span class="n">argv</span>
 </pre></div>
