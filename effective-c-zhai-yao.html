@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+        <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=endge, chrome=IE8" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no" />
+    <title>《Effective C++》摘要 — /usr/bin/sysublackbear</title>
+    <!--[if lte IE 8]><script type="text/javascript" src="/theme/js/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" type="text/css" href="/theme/css/skeleton.css" />
+    <link rel="stylesheet" type="text/css" href="/theme/css/theme.css" />
+    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <!--[if lte IE 8]><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" /><![endif]-->
+    <link rel="alternate" type="application/atom+xml"
+                           title="/usr/bin/sysublackbear — Flux Atom"
+                           href="/" /> 
+
+    <meta name="author"   content="sysublackbear" />
+    <meta name="keywords" content="C++" />
+    <link rel="stylesheet" media="not print" type="text/css" href="/theme/css/pygments.css" /> 
+  </head>
+  <body>
+    <div id="page">
+      <header id="page-head">
+        <h1>
+          <a href="/index.html">/usr/bin/sysublackbear</a>
+        </h1>
+      </header>
+      
+      <div id="page-body">
+        <article class="post" id="page-main" role="main">
+      <header class="post-header">
+        <h1>
+          <a rel="bookmark"
+             href="/effective-c-zhai-yao.html"
+             title="Lien permanent vers «《Effective C++》摘要»">
+             《Effective C++》摘要
+          </a>
+        </h1>
+        <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-09-25T02:22:00+08:00">日 25 九月 2016</time><br />
+Categories: <a href="/category/c.html">C++</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/c.html">C++</a>        </div>
+      </header>
+      <div class="post-content"> 
+        <p>看了下《Effective C++》这本书，整理了下面的一些摘要。</p>
+<h1>Chapter0.导读</h1>
+<h4>1.explict抑制隐式转换</h4>
+<p>例如：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">B</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="k">explicit</span> <span class="n">B</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">b</span> <span class="o">=</span> <span class="nb">true</span><span class="p">);</span>   <span class="c1">//default构造函数，抑制隐私zh</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h4>2.理解拷贝构造和拷贝赋值的区别</h4>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Widget</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+     <span class="n">Widget</span><span class="p">();</span>                                                   <span class="c1">//default构造函数</span>
+     <span class="n">Widget</span><span class="p">(</span><span class="k">const</span> <span class="n">Widget</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">);</span>                    <span class="c1">//copy构造函数</span>
+     <span class="n">Widget</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">Widget</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">);</span>  <span class="c1">//copy assignment操作符</span>
+     <span class="p">...</span>
+<span class="p">};</span>
+
+<span class="n">Widget</span> <span class="n">w1</span><span class="p">;</span>          <span class="c1">//调用default构造函数</span>
+<span class="n">Widget</span> <span class="n">w2</span><span class="p">;</span>          <span class="c1">//调用copy构造函数</span>
+<span class="n">w1</span> <span class="o">=</span> <span class="n">w2</span><span class="p">;</span>               <span class="c1">//调用copy assignment操作符</span>
+<span class="n">Widget</span> <span class="n">w3</span> <span class="o">=</span> <span class="n">w2</span><span class="p">;</span>     <span class="c1">//调用拷贝构造函数</span>
+</pre></div>
+
+
+<h1>Chapter1.让自己习惯C++</h1>
+<h4>1.尽量以const,enum,inline替换#define</h4>
+<p>原因：宏对应的字面值或许从未被编译器看见；或许在编译器开始处理源码之前它就被预处理器移走了。于是记号名称有可能没进入记号表内。这样会导致当你运用此常量但获得一个编译错误信息时，可能会带来困惑，因为这个错误信息也许会提到1.653而不是ASPECT_RATIO。如果ASPECT_RATIO被定义在一个非你所写的头文件内，你肯定对1.653以及它来自何处毫无概念，于是你将因为追踪它而浪费时间，这个问题也可能出现在记号式调试器中，原因相同：你所使用的名称可能并未进入记号表。
+所以最好是用const，枚举和inline来替代宏。</p>
+<h4>2.指向常量的指针和常变量指针</h4>
+<p>const char<em> p;   //non-const pointer, const data
+char</em> const p;  //const pointer, non-const data</p>
+<h4>3.当const 和 non-const 成员函数有着实质等价的实现时，令non-const 版本调用const版本可避免代码重复。</h4>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+     <span class="p">...</span>
+     <span class="k">const</span> <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="k">const</span>
+     <span class="p">{</span>
+          <span class="p">...</span>
+          <span class="p">...</span>
+          <span class="k">return</span> <span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span>
+     <span class="p">}</span>
+     <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span>   <span class="c1">//只调用 const op[]</span>
+     <span class="p">{</span>
+          <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&amp;&gt;</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">TextBlock</span><span class="o">&amp;&gt;</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">)[</span><span class="n">position</span><span class="p">]);</span>
+     <span class="p">}</span>
+     <span class="p">...</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<h4>4.为内置型对象进行手工初始化，因为C++不保证初始化他们。</h4>
+<p>如:int x;  或者是类中成员</p>
+<h4>5.类中成员赋值</h4>
+<p>构造函数最好使用成员初值列，而不要在构造函数本体内使用赋值操作。初值列列出的变量，其排列次序应该和它们在class中的声明次序相同。</p>
+<div class="highlight"><pre><span></span><span class="c1">//下面的都是赋值，而不是初始化</span>
+<span class="n">ABEntry</span><span class="o">::</span><span class="n">ABEntry</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">address</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">list</span><span class="o">&lt;</span><span class="n">PhoneNumber</span><span class="o">&gt;&amp;</span> <span class="n">phones</span><span class="p">)</span>
+<span class="p">{</span>
+     <span class="n">theName</span> <span class="o">=</span> <span class="n">name</span><span class="p">;</span>
+     <span class="n">theAddress</span> <span class="o">=</span> <span class="n">adress</span><span class="p">;</span>
+     <span class="n">thePhones</span> <span class="o">=</span> <span class="n">phones</span><span class="p">;</span>
+     <span class="n">numTimesConsulted</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>这不是最佳做法，C++规定，对象的成员变量的初始化发生在进入构造函数本体之前。而且这一种做法，效率不高，上面基于赋值的版本做法首先调用default构造函数为theName，theAdress，thePhones设初值，然后立刻再对它们赋予初值。default构造函数做的一切浪费了。
+所有，应该用成员初值列来替代赋值。</p>
+<div class="highlight"><pre><span></span><span class="n">ABEntry</span><span class="o">::</span><span class="n">ABEntry</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">address</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">list</span><span class="o">&lt;</span><span class="n">PhoneNumber</span><span class="o">&gt;&amp;</span> <span class="n">phones</span><span class="p">)</span><span class="o">:</span>
+<span class="n">theName</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+<span class="n">theAddress</span><span class="p">(</span><span class="n">address</span><span class="p">),</span>
+<span class="n">thePhones</span><span class="p">(</span><span class="n">phones</span><span class="p">),</span>
+<span class="n">numTimesConsulted</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">{}</span>
+</pre></div>
+
+
+<h4>6.为免除“跨编译单元之初始化次序”问题，请以local static对象替换non-local static 对象。</h4>
+      </div>
+      <footer class="post-footer">
+        <div class="meta">
+          Article Categories: <a href="/category/c.html">C++</a><br /> 
+          Author Articles: <a href="/author/sysublackbear.html">sysublackbear</a><br />
+          Article Tags:  #<a href="/tag/c.html">C++</a>        </div>
+      </footer>
+      </article> <!-- /#page-main -->
+
+        <aside id="page-side">
+          <!-- begin includes/sidebar.html -->
+          <nav>
+            <h3>个人主页</h3>
+            <ul>
+              <li><a href="/categories.html">Categories</a></li>
+              <li><a href="/archives.html">Archives</a></li>
+              <li><a href="/tags.html">Tags</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h3>类别</h3>
+            <ul>
+              <li><a href="/category/about.html">about</a></li>
+              <li class="active"><a href="/category/c.html">C++</a></li>
+              <li><a href="/category/code.html">code</a></li>
+              <li><a href="/category/pelican.html">pelican</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h3>链接</h3>
+            <ul>
+              <li><a href="https://www.zhihu.com/people/sysublackbear">知乎</a></li>
+              <li><a href="http://www.cnblogs.com/sysu-blackbear">博客园</a></li>
+              <li><a href="http://weibo.com/sysublackbear?is_all=1">新浪微博</a></li>
+            </ul>
+          </nav>
+          <!-- end includes/sidebar.html --></aside> <!-- /#page-side -->
+      </div>  <!-- /#page-body -->
+
+      <footer id="page-foot">
+        <p> Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
+      </footer>
+    </div> <!-- /#page -->
+  </body>
+</html>

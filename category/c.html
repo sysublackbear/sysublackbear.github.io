@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=endge, chrome=IE8" />
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no" />
-    <title>/usr/bin/sysublackbear — Articles avec le mot clé « 中大黑熊 »</title>
+    <title>/usr/bin/sysublackbear — Articles dans la catégorie «C++»</title>
     <!--[if lte IE 8]><script type="text/javascript" src="/theme/js/html5shiv.js"></script><![endif]-->
     <link rel="stylesheet" type="text/css" href="/theme/css/skeleton.css" />
     <link rel="stylesheet" type="text/css" href="/theme/css/theme.css" />
@@ -24,36 +24,49 @@
       
       <div id="page-body">
         <section id="page-main" role="main">
-<!-- <h1 class="small-title">Articles avec le mot clé « 中大黑熊 » :</h1> -->
+<!-- <h1 class="small-title">Articles dans la catégorie <i>«C++»</i> :</h1> -->
       <article class="post">
         <header class="post-header">
           <h1>
             <a rel="bookmark"
-               href="/who-am-i.html"
-               title="Lien permanent vers «Who am I»">
-               Who am I
+               href="/effective-c-zhai-yao.html"
+               title="Lien permanent vers «《Effective C++》摘要»">
+               《Effective C++》摘要
             </a>
           </h1>
           <div class="meta">
 <!-- includes/article_meta.html -->
-Date: <time datetime="2016-05-21T21:38:00+08:00">六 21 五月 2016</time><br />
-Categories: <a href="/category/about.html">about</a><br />
-Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/sysublackbear.html">sysublackbear</a>,               <a rel="tag" href="/tag/zhong-da-hei-xiong.html">中大黑熊</a>          </div>
+Date: <time datetime="2016-09-25T02:22:00+08:00">日 25 九月 2016</time><br />
+Categories: <a href="/category/c.html">C++</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/c.html">C++</a>          </div>
         </header>
         <div class="post-content"> 
-          <p>大家好，我是中大黑熊，人如其名，我来自中山大学。</p>
-<p>这个博客使用的是基于python的Pelican框架，采用dev-random2的页面模板，极其简单地搭建在github上面，记录我在当码农路上的成长历程以及一些心得感悟。
-早在大三我就在博客园上面写文章，主要在学校研究的是有关python的各种奇奇怪怪的库。</p>
-<p>之前也用过jekyll短暂搭建过博客，也写过几个读书笔记，后面毕业加入工作了，刚开始在职场并不适应，忙于工作，渐渐地把博客给荒废掉了。</p>
-<p>重拾博客的原因是某一天我看到两年前写的文章得到了有人学习了并提出感谢，我觉得我写的这些文章还是有意义的，我想如果我的一生能够为开源社区做点贡献，
-为其他入门的程序爱好者一点入门的启迪的话，我这些文章还是有必要继续写下去，继续分享下去的，作为我作为过来人的成长历程。</p>
-<p>毕业之后，我有幸加入鹅厂，并且进入了当年一夜成名的微信，但是我觉得这边技术氛围并不浓厚，微信随着自身做大，开始龙蛇混杂，开始体制僵化，当然，这也是
-任何产品，任何组织架构做大的必须面对的弊端。所以，我觉得我需要工作以外的动力来刺激我不断前进。</p>
-<p>对于我的技术之路，一开始我是在亦师亦友的元神带领下，开始进行php的开发，大三大概写了1年的php，后面转而研究python，在大三的暑假，我得到命运的眷顾，拿到了
-鹅厂的offer，进入鹅厂，开始进行后台的开发，主要使用的语言有：shell/C ...</p>
+          <p>看了下《Effective C++》这本书，整理了下面的一些摘要。</p>
+<h1>Chapter0.导读</h1>
+<h4>1.explict抑制隐式转换</h4>
+<p>例如：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">B</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="k">explicit</span> <span class="n">B</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">b</span> <span class="o">=</span> <span class="nb">true</span><span class="p">);</span>   <span class="c1">//default构造函数，抑制隐私zh</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h4>2.理解拷贝构造和拷贝赋值的区别</h4>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Widget</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+     <span class="n">Widget</span><span class="p">();</span>                                                   <span class="c1">//default构造函数</span>
+     <span class="n">Widget</span><span class="p">(</span><span class="k">const</span> <span class="n">Widget</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">);</span>                    <span class="c1">//copy构造函数</span>
+     <span class="n">Widget</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">Widget</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">);</span>  <span class="c1">//copy assignment操作符</span>
+     <span class="p">...</span>
+<span class="p">};</span>
+
+<span class="n">Widget</span> <span class="n">w1</span><span class="p">;</span>          <span class="c1">//调用default构造函数</span>
+<span class="n">Widget</span> <span class="n">w2</span><span class="p">;</span>          <span class="c1">//调用copy构造函数</span>
+<span class="n">w1</span> <span class="o">=</span> <span class="n">w2 ...</span></pre></div>
         </div>
         <footer class="post-footer">
-          <a class="readmore" href="/who-am-i.html">Read more...</a>
+          <a class="readmore" href="/effective-c-zhai-yao.html">Read more...</a>
         </footer>
       </article>
       <nav id="pagination">   <!-- <span id="first_page" class="a inactive">&#60;&#60;</span>
@@ -78,7 +91,7 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
             <h3>类别</h3>
             <ul>
               <li><a href="/category/about.html">about</a></li>
-              <li><a href="/category/c.html">C++</a></li>
+              <li class="active"><a href="/category/c.html">C++</a></li>
               <li><a href="/category/code.html">code</a></li>
               <li><a href="/category/pelican.html">pelican</a></li>
             </ul>
