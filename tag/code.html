@@ -44,6 +44,26 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
           <p>好久没有更博了，之前一直在看python的其他库和一些进阶用法。
 最近在看《Clean Code》，才疏学浅，整理一下一些常用的写代码应该注意的点吧。</p>
 <h1>1.命名</h1>
+<ul>
+<li>名副其实；</li>
+<li>避免误导；</li>
+<li>做有意义的区分（a1,a2,i,j 这些变量名区分没有任何意义）；</li>
+<li>使用读得出来的名称；</li>
+<li>使用可搜索的名称（以常量或宏代替魔鬼数字，MAX_CLASSES_PER_STUDENT = 7;)</li>
+<li>避免使用编码；</li>
+<li>成员前缀（人们会很快学会无视前缀或后缀，只看到名称中有意义的部分。代码读写得越多，眼中就越没有前缀。最终，前缀变作了不入法眼的废料，变作了旧代码的标志物）（<em>不敢苟同</em>）</li>
+<li>接口与实现；</li>
+<li>避免思维映射；</li>
+<li>类名（类名不应该是动词）；</li>
+<li>方法名（方法名应当是动词或动词短语）；</li>
+</ul>
+<p>重载构造器时，使用描述了参数的静态工厂方法名。例如：</p>
+<div class="highlight"><pre><span></span><span class="n">Complex</span> <span class="n">fulcrumPoint</span> <span class="o">=</span> <span class="n">Complex</span><span class="p">.</span><span class="n">FromRealNumber</span><span class="p">(</span><span class="mf">23.0</span><span class="p">);</span>
+</pre></div>
+
+
+<p>通常好于：</p>
+<div class="highlight"><pre><span></span><span class="n">Complex</span> <span class="n">fulcrumPoint ...</span></pre></div>
         </div>
         <footer class="post-footer">
           <a class="readmore" href="/dai-ma-zheng-ji-zhi-dao-de-yi-xie-zhun-ze-zhai-yao.html">Read more...</a>
