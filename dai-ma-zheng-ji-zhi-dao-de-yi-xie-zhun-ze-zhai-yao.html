@@ -78,6 +78,75 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
 <li>添加有意义的语境；</li>
 <li>不要添加没用的语境。</li>
 </ul>
+<h1>2.函数</h1>
+<h3>2.1.函数存在的目的</h3>
+<p>函数追求的目标是要<strong>短小</strong>,同时函数的设计的原则：
+<strong>函数应该做一件事。做好这件事。只做这一件事。</strong>
+注意函数应该分层，要判断函数是否不止做了一件事，还有一个方法，就是看是否能再拆出一个函数，该函数不仅只是单纯地重新诠释其实现。</p>
+<h3>2.2.每个函数一个抽象层级</h3>
+<p><strong>自顶向下读代码：向下规则</strong></p>
+<p>按照这个规则分层：</p>
+<p>To 做事情1, we should 做事情2
+To 做事情2, we should 做事情3
+​      ...</p>
+<h3>2.3.Switch语句</h3>
+<p>对待<strong>switch语句</strong>的正确解决方法是：将switch语句埋到抽象工厂底下，不让任何人看到。该工厂使用switch语句为Employee的派生物创建适当的实体，而不同的函数，如calculatePay，isPayday和deliverPay等，则藉由Employee接口多态地接受派遣。</p>
+<p>例如：</p>
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">boolean</span> <span class="nf">isPayday</span><span class="o">();</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="n">Money</span> <span class="nf">calculatePay</span><span class="o">();</span>
+  <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">deliverPay</span><span class="o">(</span><span class="n">Money</span> <span class="n">pay</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="o">---------------------</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">EmployeeFactory</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="n">Employee</span> <span class="nf">makeEmployee</span><span class="o">(</span><span class="n">EmployeeRecord</span> <span class="n">r</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InvalidEmployeeType</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="o">---------------------</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeFactoryImpl</span> <span class="kd">implements</span> <span class="n">EmployeeFactory</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="n">Employee</span> <span class="nf">makeEmployee</span><span class="o">(</span><span class="n">EmployeeRecord</span> <span class="n">r</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InvalidEmployeeType</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="na">type</span><span class="o">){</span>
+      <span class="k">case</span> <span class="n">COMMISSIONED</span><span class="o">:</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">CommissionedEmployee</span><span class="o">(</span><span class="n">r</span><span class="o">);</span>
+      <span class="k">case</span> <span class="n">HOURLY</span><span class="o">:</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">HourlyEmployee</span><span class="o">(</span><span class="n">r</span><span class="o">);</span>
+      <span class="k">case</span> <span class="n">SALARIED</span><span class="o">:</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">SalariedEmployee</span><span class="o">(</span><span class="n">r</span><span class="o">);</span>
+      <span class="k">default</span><span class="o">:</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">InvalidEmployeeType</span><span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="na">type</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3>2.4.函数参数</h3>
+<p>函数最理想的参数数量是零（零参数函数），其次是一（单参数函数），再次是二（双参数函数），应尽量避免三（三参数函数）。</p>
+<h3>2.5.避免函数产生副作用</h3>
+<p>副作用是一种谎言。函数承诺只做一件事，但还是会做其他被藏起来的事情。有时，它会对自己类中的变量做出未能预期的改动。有时，它会把变量搞成向函数传递的参数或是系统的全局变量。无论哪种情况，都具有破坏性的，会导致奇怪的时序性耦合及顺序依赖。</p>
+<h3>2.6.分隔指令与询问</h3>
+<p>例如在变量的set方法返回类型为void，不应该是bool，不应该包含IsAttrSet，区分好两个方法</p>
+<ul>
+<li>SetAttr</li>
+<li>IsAttrSet</li>
+</ul>
+<h3>2.7.错误代码抽离</h3>
+<p>注意两个原则：</p>
+<ul>
+<li>运用try-catch结构：把错误处理代码从主路径代码中分离出来。</li>
+<li>最好把try和catch代码块的主体部分抽离出来，另外形成函数。</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="k">try</span> <span class="o">{</span>
+  <span class="n">deletePageAndAllReferences</span><span class="o">(</span><span class="n">page</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">logError</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3>2.8.错误处理就是一件事</h3>
+<p>处理错误的函数不该做其他事。</p>
+<p>未完待续......</p>
       </div>
       <footer class="post-footer">
         <div class="meta">
