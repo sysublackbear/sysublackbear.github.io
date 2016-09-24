@@ -172,7 +172,7 @@ char</em> const p;  //const pointer, non-const data</p>
      <span class="n">Uncopyable</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">Uncopyable</span><span class="o">&amp;</span><span class="p">);</span>
 <span class="p">};</span>
 
-<span class="err">为求阻止</span><span class="n">HomeForSale</span><span class="err">对象被拷贝，我们唯一选择的就是继承</span><span class="n">Uncopyable</span><span class="err">：</span>
+<span class="c1">//为求阻止HomeForSale对象被拷贝，我们唯一选择的就是继承Uncopyable：</span>
 <span class="k">class</span>  <span class="nc">HomeForSale</span><span class="o">:</span> <span class="k">private</span> <span class="n">Uncopyable</span> <span class="p">{</span>
      <span class="p">...</span>
 <span class="p">};</span>
