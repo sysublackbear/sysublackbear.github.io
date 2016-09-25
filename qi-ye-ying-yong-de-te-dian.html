@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+        <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=endge, chrome=IE8" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no" />
+    <title>企业应用的特点 — /usr/bin/sysublackbear</title>
+    <!--[if lte IE 8]><script type="text/javascript" src="/theme/js/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" type="text/css" href="/theme/css/skeleton.css" />
+    <link rel="stylesheet" type="text/css" href="/theme/css/theme.css" />
+    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <!--[if lte IE 8]><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" /><![endif]-->
+    <link rel="alternate" type="application/atom+xml"
+                           title="/usr/bin/sysublackbear — Flux Atom"
+                           href="/" /> 
+
+    <meta name="author"   content="sysublackbear" />
+    <meta name="keywords" content="软件设计, 架构模式" />
+    <link rel="stylesheet" media="not print" type="text/css" href="/theme/css/pygments.css" /> 
+  </head>
+  <body>
+    <div id="page">
+      <header id="page-head">
+        <h1>
+          <a href="/index.html">/usr/bin/sysublackbear</a>
+        </h1>
+      </header>
+      
+      <div id="page-body">
+        <article class="post" id="page-main" role="main">
+      <header class="post-header">
+        <h1>
+          <a rel="bookmark"
+             href="/qi-ye-ying-yong-de-te-dian.html"
+             title="Lien permanent vers «企业应用的特点»">
+             企业应用的特点
+          </a>
+        </h1>
+        <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-09-26T12:49:00+08:00">一 26 九月 2016</time><br />
+Categories: <a href="/category/jia-gou-mo-shi.html">架构模式</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/ruan-jian-she-ji.html">软件设计</a>,               <a rel="tag" href="/tag/jia-gou-mo-shi.html">架构模式</a>        </div>
+      </header>
+      <div class="post-content"> 
+        <h1>1.企业应用的特点</h1>
+<ul>
+<li>企业应用一般涉及<strong>持久化数据</strong>;</li>
+<li>企业应用一般涉及<strong>很多人同时访问数据</strong>;</li>
+<li>企业应用还涉及<strong>大量操作数据的用户界面</strong>;</li>
+<li>企业应用很少独立存在，通常需要<strong>与散布在企业周围的其他企业应用集成</strong>;</li>
+<li>同时还会带来业务过程中的差异以及数据中<strong>概念的不一致性</strong>;</li>
+<li>在业务开发的过程中，成千上万的"一次性特殊情况"最终导致了<strong>复杂的业务"无逻辑"</strong>;</li>
+</ul>
+<h1>2.系统性能应该关注的几个指标</h1>
+<ol>
+<li><strong>响应时间</strong>：是指系统完成一次外部请求处理所需的时间，如用户的交互行为。</li>
+<li><strong>响应性</strong>：响应性不同于请求处理，它是系统响应请求的速度有多快。</li>
+<li><strong>等待时间</strong>：是获得系统任何形式响应的最小时间，即使应该做的工作并不存在，如调用过程中的线路传输。</li>
+<li><strong>吞吐率</strong>：是给定时间内能够处理多大的请求量，通常用每秒事务数(tps)来度量。这种方法的一个问题是指标依赖与事务的复杂程度。</li>
+<li><strong>负载</strong>：关于系统当前负荷的表述，也许可以用当前有多少用户与系统相连来表示。</li>
+<li><strong>负载敏感度</strong>：是指响应时间随负载变化的程度。</li>
+<li><strong>效率</strong>：是性能除以资源。如果一台双CPU系统的性能是30tps，另一个系统有4个同样的CPU系统性能是40tps，则前者效率高于后者。</li>
+<li><strong>容量</strong>：系统的容量是指最大有效负载或者吞吐率的指标。它可以是一个绝对值最大值或者性能衰减至低于一个可接受的阈值之前的临界值。</li>
+<li><strong>可伸缩性</strong>：可伸缩性度量是系统中增加资源（通常是硬件）对系统性能的影响。其中，<strong>垂直可伸缩性</strong>或称<strong>垂直延展</strong>，通常是指提高单个服务器的性能，例如增加内存；<strong>水平可伸缩性</strong>或称<strong>水平延展</strong>，通常是指增加服务器数目。</li>
+</ol>
+<h1>3.系统分层的利弊</h1>
+<p>将系统按照层次分解有很多重要的好处：
+- 在无需过多了解其他层次的基础上，可以将某一层作为一个有机整体来理解。例如：无需知道以太网的工作细节，你照样可以在TCP上构建FTP服务。
+- 可以替换某层的具体实现，只要前后提供的服务相同即可。
+- 可以将层次间的依赖性减到最低。
+- 分层有利于标准化工作。
+- 一旦构建好了某一层次，就可以用它为很多上层服务提供支持。</p>
+<p>但是分层也有它的弊端：
+- 层次并不能封装所有的东西，有时它会为我们带来级联修改。最经典的例子就是在一个分层设计的企业应用中，如果要增加一个在用户界面上显示的数据域，就必须在数据库中增加相应的字段，还必须在用户界面和数据库之间的每一层做相应的修改。
+- 过多的层次会影响性能。在每一层，一般都会从一种表现形式转换到另一种（组装函数Assemble，Disassemble）。不过底层功能的封装通常会带来比代价更大的效率提升。例如，可以优化事务控制层，提高其他各层的效率。</p>
+<h1>4.企业应用层次的演化</h1>
+<ol>
+<li>批处理系统：无层次结构；</li>
+<li>客户端/服务器两层结构系统；</li>
+<li>表现层（用户界面），领域层（领域逻辑）和数据源层（存取数据）的三层结构。</li>
+</ol>
+<h1>5.区分领域逻辑的方法</h1>
+<p>使用领域逻辑时，其中一个最困难的部分就是区分什么是领域逻辑，什么是其他逻辑。一种不太正规的测试方法就是：假想向系统中增加一个完全不同的新层，例如为Web应用增加一个命令行界面层。如果在这个过程中，发现需要重复实现某些功能，则说明可能有一些本应该在领域层实现的逻辑，现在在表现层实现了，换言之，这部分的逻辑可以抽离出来，放到领域层里面。</p>
+      </div>
+      <footer class="post-footer">
+        <div class="meta">
+          Article Categories: <a href="/category/jia-gou-mo-shi.html">架构模式</a><br /> 
+          Author Articles: <a href="/author/sysublackbear.html">sysublackbear</a><br />
+          Article Tags:  #<a href="/tag/ruan-jian-she-ji.html">软件设计</a> #<a href="/tag/jia-gou-mo-shi.html">架构模式</a>        </div>
+      </footer>
+      </article> <!-- /#page-main -->
+
+        <aside id="page-side">
+          <!-- begin includes/sidebar.html -->
+          <nav>
+            <h3>个人主页</h3>
+            <ul>
+              <li><a href="/categories.html">Categories</a></li>
+              <li><a href="/archives.html">Archives</a></li>
+              <li><a href="/tags.html">Tags</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h3>类别</h3>
+            <ul>
+              <li><a href="/category/about-me.html">about me</a></li>
+              <li><a href="/category/c.html">C++</a></li>
+              <li><a href="/category/code.html">code</a></li>
+              <li class="active"><a href="/category/jia-gou-mo-shi.html">架构模式</a></li>
+              <li><a href="/category/pelican.html">pelican</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h3>链接</h3>
+            <ul>
+              <li><a href="https://www.zhihu.com/people/sysublackbear">知乎</a></li>
+              <li><a href="http://www.cnblogs.com/sysu-blackbear">博客园</a></li>
+              <li><a href="http://weibo.com/sysublackbear?is_all=1">新浪微博</a></li>
+            </ul>
+          </nav>
+          <!-- end includes/sidebar.html --></aside> <!-- /#page-side -->
+      </div>  <!-- /#page-body -->
+
+      <footer id="page-foot">
+        <p> Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
+      </footer>
+    </div> <!-- /#page -->
+  </body>
+</html>
