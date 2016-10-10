@@ -29,6 +29,35 @@
         <header class="post-header">
           <h1>
             <a rel="bookmark"
+               href="/qi-ye-jia-gou-mo-shi-bi-ji-er.html"
+               title="Lien permanent vers «企业架构模式笔记二»">
+               企业架构模式笔记二
+            </a>
+          </h1>
+          <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-10-10T23:42:00+08:00">一 10 十月 2016</time><br />
+Categories: <a href="/category/jia-gou-mo-shi.html">架构模式</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/ruan-jian-she-ji.html">软件设计</a>,               <a rel="tag" href="/tag/jia-gou-mo-shi.html">架构模式</a>,               <a rel="tag" href="/tag/ling-yu-mo-xing.html">领域模型</a>          </div>
+        </header>
+        <div class="post-content"> 
+          <h1>1.组织领域逻辑的三种主要模式</h1>
+<h3>一.事务脚本</h3>
+<p>事务脚本具有如下几个优点：
+- 它是一个大多数开发者都能理解的简单过程模型；
+- 它能够与一个使用<strong>行数据入口</strong>或<strong>表数据入口</strong>的简单数据层很好地协作；
+- 设定事务边界的方法显而易见：一个事务始于其脚本的打开，终于其脚本的关闭。很容易用工具在幕后设定事务边界。</p>
+<p>但是，事务脚本也存在许多缺点，当领域逻辑复杂性增加时这些缺点就会凸现。当若干个事务需要做相似的动作时，通常使多个脚本中包含某些相同的代码。通过将这些代码提取出来组织成功公共的子例程可以部分消除这种情况，但在许多时候，消除副本仍比较棘手，而检测副本则更为困难。这使得应用程序没有清晰的结构。</p>
+<h3>二.领域逻辑</h3>
+        </div>
+        <footer class="post-footer">
+          <a class="readmore" href="/qi-ye-jia-gou-mo-shi-bi-ji-er.html">Read more...</a>
+        </footer>
+      </article>
+      <article class="post">
+        <header class="post-header">
+          <h1>
+            <a rel="bookmark"
                href="/qi-ye-ying-yong-de-te-dian.html"
                title="Lien permanent vers «企业应用的特点»">
                企业应用的特点
@@ -200,42 +229,12 @@ pip install ...</pre></div>
           <a class="readmore" href="/shou-ba-shou-da-jian-ji-yu-pelicande-bo-ke-huan-jing.html">Read more...</a>
         </footer>
       </article>
-      <article class="post">
-        <header class="post-header">
-          <h1>
-            <a rel="bookmark"
-               href="/who-am-i.html"
-               title="Lien permanent vers «Who am I»">
-               Who am I
-            </a>
-          </h1>
-          <div class="meta">
-<!-- includes/article_meta.html -->
-Date: <time datetime="2016-05-21T21:38:00+08:00">六 21 五月 2016</time><br />
-Categories: <a href="/category/about-me.html">about me</a><br />
-Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/sysublackbear.html">sysublackbear</a>,               <a rel="tag" href="/tag/zhong-da-hei-xiong.html">中大黑熊</a>          </div>
-        </header>
-        <div class="post-content"> 
-          <p>大家好，我是中大黑熊，人如其名，我来自中山大学。</p>
-<p>这个博客使用的是基于python的Pelican框架，采用dev-random2的页面模板，极其简单地搭建在github上面，记录我在当码农路上的成长历程以及一些心得感悟。
-早在大三我就在博客园上面写文章，主要在学校研究的是有关python的各种奇奇怪怪的库。</p>
-<p>之前也用过jekyll短暂搭建过博客，也写过几个读书笔记，后面毕业加入工作了，刚开始在职场并不适应，忙于工作，渐渐地把博客给荒废掉了。</p>
-<p>重拾博客的原因是某一天我看到两年前写的文章得到了有人学习了并提出感谢，我觉得我写的这些文章还是有意义的，我想如果我的一生能够为开源社区做点贡献，
-为其他入门的程序爱好者一点入门的启迪的话，我这些文章还是有必要继续写下去，继续分享下去的，作为我作为过来人的成长历程。</p>
-<p>毕业之后，我有幸加入鹅厂，并且进入了当年一夜成名的微信，但是我觉得这边技术氛围并不浓厚，微信随着自身做大，开始龙蛇混杂，开始体制僵化，当然，这也是
-任何产品，任何组织架构做大的必须面对的弊端。所以，我觉得我需要工作以外的动力来刺激我不断前进。</p>
-<p>对于我的技术之路，一开始我是在亦师亦友的元神带领下，开始进行php的开发，大三大概写了1年的php，后面转而研究python，在大三的暑假，我得到命运的眷顾，拿到了
-鹅厂的offer，进入鹅厂，开始进行后台的开发，主要使用的语言有：shell/C ...</p>
-        </div>
-        <footer class="post-footer">
-          <a class="readmore" href="/who-am-i.html">Read more...</a>
-        </footer>
-      </article>
       <nav id="pagination">   <!-- <span id="first_page" class="a inactive">&#60;&#60;</span>
         <span id="first_page" class="a inactive">&#60;</span> -->
         <span class="a active">1</span>
-   <!-- <span id="next_page" class="a inactive">&#62;</span>
-        <span id="next_page" class="a inactive">&#62;&#62;</span> -->
+        <a href="/author/sysublackbear2.html">2</a>
+        <a id="next_page" href="/author/sysublackbear2.html">&#62;</a>
+        <a id="last_page" href="/author/sysublackbear2.html">&#62;&#62;</a>
 </nav>      </section> <!-- /#page-main -->
 
         <aside id="page-side">
