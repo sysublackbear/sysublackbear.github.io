@@ -29,6 +29,46 @@
         <header class="post-header">
           <h1>
             <a rel="bookmark"
+               href="/effective-python-chapter1zong-jie.html"
+               title="Lien permanent vers «《Effective Python》Chapter1总结»">
+               《Effective Python》Chapter1总结
+            </a>
+          </h1>
+          <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-10-30T23:39:00+08:00">日 30 十月 2016</time><br />
+Categories: <a href="/category/python.html">python</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/python.html">python</a>          </div>
+        </header>
+        <div class="post-content"> 
+          <p>最近在看《Effective Python》这本书，觉得很不错，对于今后的代码如何写得更pythonic。整理下吧，后面可以反复看，感觉很多建议都非常实用。</p>
+<p>下面是一些重点摘要：</p>
+<h1>Chapter1.用Pythonic 方式来思考</h1>
+<h4>第1条：确认自己所用的Python 版本</h4>
+<p>没什么可说的，还是尽快把代码迁往py3.x吧，顺便写下如何了解所使用的具体版本python：</p>
+<div class="highlight"><pre><span></span><span class="err">➜</span>  <span class="o">~</span> <span class="n">python</span> <span class="o">--</span><span class="n">version</span>
+<span class="n">Python</span> <span class="mf">2.7</span><span class="o">.</span><span class="mi">10</span>
+<span class="err">➜</span>  <span class="o">~</span> <span class="n">python3</span> <span class="o">--</span><span class="n">version</span>
+<span class="n">Python</span> <span class="mf">3.5</span><span class="o">.</span><span class="mi">0</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+</pre></div>
+
+
+<ul>
+<li>有两种版本的Python处于活跃的状态：python2 和 python3；</li>
+<li>有多种流行的Python运行时环境，例如：CPython，Jython，IronPython 以及 ...</li></ul>
+        </div>
+        <footer class="post-footer">
+          <a class="readmore" href="/effective-python-chapter1zong-jie.html">Read more...</a>
+        </footer>
+      </article>
+      <article class="post">
+        <header class="post-header">
+          <h1>
+            <a rel="bookmark"
                href="/qi-ye-jia-gou-mo-shi-bi-ji-er.html"
                title="Lien permanent vers «企业架构模式笔记二»">
                企业架构模式笔记二
@@ -188,53 +228,6 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
           <a class="readmore" href="/dai-ma-zheng-ji-zhi-dao-de-yi-xie-zhun-ze-zhai-yao.html">Read more...</a>
         </footer>
       </article>
-      <article class="post">
-        <header class="post-header">
-          <h1>
-            <a rel="bookmark"
-               href="/shou-ba-shou-da-jian-ji-yu-pelicande-bo-ke-huan-jing.html"
-               title="Lien permanent vers «手把手搭建基于pelican的博客环境»">
-               手把手搭建基于pelican的博客环境
-            </a>
-          </h1>
-          <div class="meta">
-<!-- includes/article_meta.html -->
-Date: <time datetime="2016-05-21T22:17:00+08:00">六 21 五月 2016</time><br />
-Categories: <a href="/category/pelican.html">pelican</a><br />
-Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/blog.html">blog</a>,               <a rel="tag" href="/tag/python.html">python</a>          </div>
-        </header>
-        <div class="post-content"> 
-          <p>下面说一下我是如何搭建这个博客的，这个博客用的静态模板框架是<code>pelican</code>,
-是一个基于<code>python</code>的一个框架，因为自己对<code>python</code>算是比较熟悉，
-定制化对自己来说也没有那么难。</p>
-<h2>1.安装pelican和pip</h2>
-<p><code>pip</code>这么强悍的<code>python</code>包管理工具，不可能错过了吧。</p>
-<div class="highlight"><pre><span></span>$ easy_install pip
-</pre></div>
-
-
-<p>此外，为了单独为<code>pelican</code>环境进行一个单独的沙箱隔离，最后也安装一个沙箱环境：<code>virtualenv</code>。</p>
-<div class="highlight"><pre><span></span>$ pip install virtualenv
-</pre></div>
-
-
-<p>然后初始化沙箱环境</p>
-<div class="highlight"><pre><span></span>mkdir pelicanBlog
-<span class="nb">cd</span> pelicanBlog
-<span class="c1">#设定沙箱环境名字venv</span>
-virtualenv --no-site-packages venv
-<span class="nb">source</span> venv/bin/active
-</pre></div>
-
-
-<p>然后安装<code>pelican</code>和<code>markdown</code></p>
-<div class="highlight"><pre><span></span>pip install pelican
-pip install ...</pre></div>
-        </div>
-        <footer class="post-footer">
-          <a class="readmore" href="/shou-ba-shou-da-jian-ji-yu-pelicande-bo-ke-huan-jing.html">Read more...</a>
-        </footer>
-      </article>
       <nav id="pagination">   <!-- <span id="first_page" class="a inactive">&#60;&#60;</span>
         <span id="first_page" class="a inactive">&#60;</span> -->
         <span class="a active">1</span>
@@ -262,6 +255,7 @@ pip install ...</pre></div>
               <li><a href="/category/code.html">code</a></li>
               <li><a href="/category/jia-gou-mo-shi.html">架构模式</a></li>
               <li><a href="/category/pelican.html">pelican</a></li>
+              <li><a href="/category/python.html">python</a></li>
             </ul>
           </nav>
 

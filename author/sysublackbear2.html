@@ -29,6 +29,53 @@
         <header class="post-header">
           <h1>
             <a rel="bookmark"
+               href="/shou-ba-shou-da-jian-ji-yu-pelicande-bo-ke-huan-jing.html"
+               title="Lien permanent vers «手把手搭建基于pelican的博客环境»">
+               手把手搭建基于pelican的博客环境
+            </a>
+          </h1>
+          <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-05-21T22:17:00+08:00">六 21 五月 2016</time><br />
+Categories: <a href="/category/pelican.html">pelican</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/blog.html">blog</a>,               <a rel="tag" href="/tag/python.html">python</a>          </div>
+        </header>
+        <div class="post-content"> 
+          <p>下面说一下我是如何搭建这个博客的，这个博客用的静态模板框架是<code>pelican</code>,
+是一个基于<code>python</code>的一个框架，因为自己对<code>python</code>算是比较熟悉，
+定制化对自己来说也没有那么难。</p>
+<h2>1.安装pelican和pip</h2>
+<p><code>pip</code>这么强悍的<code>python</code>包管理工具，不可能错过了吧。</p>
+<div class="highlight"><pre><span></span>$ easy_install pip
+</pre></div>
+
+
+<p>此外，为了单独为<code>pelican</code>环境进行一个单独的沙箱隔离，最后也安装一个沙箱环境：<code>virtualenv</code>。</p>
+<div class="highlight"><pre><span></span>$ pip install virtualenv
+</pre></div>
+
+
+<p>然后初始化沙箱环境</p>
+<div class="highlight"><pre><span></span>mkdir pelicanBlog
+<span class="nb">cd</span> pelicanBlog
+<span class="c1">#设定沙箱环境名字venv</span>
+virtualenv --no-site-packages venv
+<span class="nb">source</span> venv/bin/active
+</pre></div>
+
+
+<p>然后安装<code>pelican</code>和<code>markdown</code></p>
+<div class="highlight"><pre><span></span>pip install pelican
+pip install ...</pre></div>
+        </div>
+        <footer class="post-footer">
+          <a class="readmore" href="/shou-ba-shou-da-jian-ji-yu-pelicande-bo-ke-huan-jing.html">Read more...</a>
+        </footer>
+      </article>
+      <article class="post">
+        <header class="post-header">
+          <h1>
+            <a rel="bookmark"
                href="/who-am-i.html"
                title="Lien permanent vers «Who am I»">
                Who am I
@@ -83,6 +130,7 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
               <li><a href="/category/code.html">code</a></li>
               <li><a href="/category/jia-gou-mo-shi.html">架构模式</a></li>
               <li><a href="/category/pelican.html">pelican</a></li>
+              <li><a href="/category/python.html">python</a></li>
             </ul>
           </nav>
 
