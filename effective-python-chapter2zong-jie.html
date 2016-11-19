@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+        <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=endge, chrome=IE8" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no" />
+    <title>《Effective Python》Chapter2总结 — /usr/bin/sysublackbear</title>
+    <!--[if lte IE 8]><script type="text/javascript" src="/theme/js/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" type="text/css" href="/theme/css/skeleton.css" />
+    <link rel="stylesheet" type="text/css" href="/theme/css/theme.css" />
+    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <!--[if lte IE 8]><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" /><![endif]-->
+    <link rel="alternate" type="application/atom+xml"
+                           title="/usr/bin/sysublackbear — Flux Atom"
+                           href="/" /> 
+
+    <meta name="author"   content="sysublackbear" />
+    <meta name="keywords" content="python" />
+    <link rel="stylesheet" media="not print" type="text/css" href="/theme/css/pygments.css" /> 
+  </head>
+  <body>
+    <div id="page">
+      <header id="page-head">
+        <h1>
+          <a href="/index.html">/usr/bin/sysublackbear</a>
+        </h1>
+      </header>
+      
+      <div id="page-body">
+        <article class="post" id="page-main" role="main">
+      <header class="post-header">
+        <h1>
+          <a rel="bookmark"
+             href="/effective-python-chapter2zong-jie.html"
+             title="Lien permanent vers «《Effective Python》Chapter2总结»">
+             《Effective Python》Chapter2总结
+          </a>
+        </h1>
+        <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-11-09T00:42:00+08:00">三 09 十一月 2016</time><br />
+Categories: <a href="/category/python.html">python</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/python.html">python</a>        </div>
+      </header>
+      <div class="post-content"> 
+        <p>继续，Chapter2的梳理如下：</p>
+<h1>Chapter2.函数</h1>
+<h4>第14条：尽量用异常来表示特殊情况，而不要返回None</h4>
+<p><strong>要点：</strong></p>
+<ul>
+<li>用<strong>None</strong>这个返回值来表示特殊意义的函数，很容易使调用者犯错，因为None和0 及空字符串之类的值，在条件表达式里都会评估为False；</li>
+<li>函数在遇到特殊情况时，应该抛出异常，而不要返回None。调用者看到该函数的文档中所描述的异常之后，应该就会编写相应的代码来处理它们了。</li>
+</ul>
+<p>举个例子：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+
+
+<p>这里会产生一个错觉，我们可能不会专门去判断函数的返回值是否为None，而是会假定：只要返回了与False 等效的运算结果，就说明函数出错了。</p>
+<div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Invalid inputs&#39;</span><span class="p">)</span>  <span class="c1"># This is wrong.</span>
+</pre></div>
+
+
+<p>所以，选用以下这种方法更好一些，那就是根本不返回None，而是把异常抛给上一级，使得调用者必须应对它。本例中，把ZeroDivisionError 转化为 ValueError，用以表示调用者所给的输入值是无效的：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid inputs&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+</pre></div>
+
+
+<h4>第15条：了解如何在闭包里使用外围作用域中的变量</h4>
+<p>​        假如有一份列表，其中的元素都是数字，现在要对其排序，但排序时，要把出现在某个群组内的数字，放在群组外的那些数字之前。</p>
+<p>​        实现该功能的一种常见做法，是在调用列表的sort方法时，把辅助函数传给key参数。这个辅助函数的返回值，将会用来确定列表中各元素的顺序。辅助函数可以判断受测元素是否处在重要群组中，并据此返回相应的排序关键字。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sort_priority</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">helper</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">helper</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="n">group</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">}</span>  <span class="c1"># set([2, 3, 5, 7])</span>
+<span class="n">sort_priority</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+</pre></div>
+
+
+<p>这个函数之所以能够正常运作，是基于下列三个原因：</p>
+<ul>
+<li>Python 支持闭包（closure）：闭包是一种定义在某个作用域中的函数，这种函数引用了那个作用域里面的变量。helper 函数之所以能够访问sort_priority 的group 参数，原因就在于它是闭包；</li>
+<li>Python 的函数是一级对象，也就是说，我们可以直接引用函数，把函数赋值给变量，把函数当成参数传给其他函数，并通过表达式及if 语句对其进行比较和判断，等等。于是，我们可以把helper 这个闭包函数，传给sort方法的key 参数。</li>
+<li>Python 使用特殊的规则来比较两个元组。它首先比较各元组中下标为0 的对应元素，如果相等，再比较下标为1 的对应元素，如果还是相等，那就继续比较下标为2 的对应元素，依次类推。</li>
+</ul>
+<p>看下面修改的第二种写法：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sort_priority2</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># Scope: &#39;sort_priority2&#39;</span>
+    <span class="k">def</span> <span class="nf">helper</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># Scope: &#39;helper&#39; -- Bad!</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">numbers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span> <span class="o">=</span> <span class="n">helper</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">found</span>
+
+<span class="n">found</span> <span class="o">=</span> <span class="n">sort_priority2</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+</pre></div>
+
+
+<p>但是下面有个问题，排序结果是对的，但是found 值不对，原因是：</p>
+<p>在表达式中引用变量时，Python 解释器将按如下顺序遍历各作用域，以解析该引用：</p>
+<ol>
+<li>当前函数的作用域；</li>
+<li>任何外围作用域（例如，包含当前函数的其他函数）；</li>
+<li>包含当前代码的那个模块的作用域（也叫全局作用域，global scope）；</li>
+<li>内置作用域（也就是包含len 及 str 等函数的那个作用域）。</li>
+</ol>
+<p>如果上面这些地方都没有定义过名称相符的变量，那就抛出NameError 异常。</p>
+<p>因此上面的found变量会在两个区域都会建立一个。</p>
+<p>其实，Python 语言是故意要这么设计的。这样做可以防止函数中的局部变量污染函数外面的那个模块。假如不这么做，那么函数里的每个赋值操作，都会影响外围模块的全局作用域。那样不仅显得混乱，而且由于全局变量还会与其他代码产生交互作用，所以可能引发难以探查的bug。</p>
+<p><strong>那么，该如何获取闭包内的数据呢？</strong></p>
+<ol>
+<li>Python3 中有一种特殊的写法，能够获取闭包内的数据。我们可以用<code>nonlocal</code>语句来表明这样的意图，也就是：给相关变量赋值的时候，应该在上层作用域中查找该变量。<code>nonlocal</code>的唯一限制在于，它不能延伸到模块级别，这是为了防止它污染全局作用域。</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sort_priority3</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">def</span> <span class="nf">helper</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="n">nonlocal</span> <span class="n">found</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">numbers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">helper</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">found</span>
+</pre></div>
+
+
+<p>然而，<code>nonlocal</code>也会像全局变量那样，遭到滥用，所以，建议大家只在极其简单的函数里使用这种机制。<code>nonlocal</code>的副作用很难追踪，尤其是在比较长的的函数中，修饰某变量的<code>nonlocal</code>语句可能和修改该变量的赋值操作离得比较远，从而导致代码更加难以理解。</p>
+<p>如果使用<code>nonlocal</code>的那些代码，已经写的越来越复杂。那就应该将相关的状态封装成辅助类 (helper class)。下面定义的这个类，与<code>nonlocal</code>所达成的功能相同。它虽然有点长，但是理解起来相当容易。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Sorter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">found</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+ <span class="n">sorter</span> <span class="o">=</span> <span class="n">Sorter</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+ <span class="n">numbers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">sorter</span><span class="p">)</span>
+ <span class="k">assert</span> <span class="n">sorter</span><span class="o">.</span><span class="n">found</span> <span class="ow">is</span> <span class="bp">True</span>
+</pre></div>
+
+
+<ol>
+<li>但是对于Python 2 而言，Python 2 不支持<code>nonlocal</code>关键字。为了实现类似的功能，需要利用Python 的作用域规则来解决。这种做法虽然不太优雅，但已经成为Python 的一种编程习惯。</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="c1"># Python 2</span>
+<span class="k">def</span> <span class="nf">sort_priority</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">helper</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+            <span class="n">found</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span> <span class="p">,</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">numbers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">helper</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">found</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>   
+</pre></div>
+
+
+<p>​        上级作用域中的<code>found</code>变量是个列表，由于列表本身是可供修改（<code>mutable</code>，可变的），所以获取到这个<code>found</code>列表后，我们就可以在闭包里面通过<code>found[0]=True</code>语句，来修改<code>found</code>的状态。这就是该技巧的原理。</p>
+<p>​        上级作用域中的变量是字典，集或某个类的实例时，这个技巧也同样适用。</p>
+<p><strong>要点：</strong></p>
+<ul>
+<li>对于定义在某作用域内的闭包来说，它可以引用这些作用域中的变量。</li>
+<li>使用默认方式对闭包内的变量赋值，不会影响外围作用域中的同名变量。</li>
+<li>在Python 3 中，程序可以在闭包内用<code>nonlocal</code>语句来修饰某个名称，使该闭包能够修改外围作用域中的同名变量。</li>
+<li>在Python 2 中，程序可以使用可变值（例如，包含单个元素的列表）来实现与<code>nonlocal</code>语句相仿的机制。</li>
+<li>除了那种比较简单的函数，尽量不要用<code>nonlocal</code>语句。</li>
+</ul>
+<h4>第16条：考虑用生成器来改写直接返回列表的函数</h4>
+<p>如果函数要产生一系列结果，那么最简单的做法就是把这些结果都放在一份列表里，并将其返回给调用者。例如，我们要查出字符串中每个词的首字母，在整个字符串里的位置。如下：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">index_words</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">letter</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">letter</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+
+<p>这里有个问题是，这段代码写得有点拥挤。每次找到新的结果，都要调用<code>append</code>方法。在函数主体部分的约130个字符里，重要的大概只有75个。</p>
+<p>这个函数改用生成器来写会更好。生成器是使用<code>yield</code>表达式的函数。调用生成器函数时，它并不会真的运行，而是会返回迭代器。每次在这个迭代器上面调用内置的<code>next</code>函数时，迭代器会把生成器推进到下一个<code>yield</code>表达式那里。生成器传给<code>yield</code>的每一个值，都会由迭代器返回给调用者。</p>
+<p>生成器函数如下：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">index_words_iter</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">letter</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">letter</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+
+
+<p>返回迭代器转变为列表的使用方法是：</p>
+<div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">index_words_iter</span><span class="p">(</span><span class="n">address</span><span class="p">))</span>
+</pre></div>
+
+
+<p>下面定义的这个生成器，会从文件里面依次读入各行内容，然后逐个处理每行中的单词，并产生相应结果。该函数执行时所耗的内存，<strong>由单行输入值的最大字符数来界定</strong>。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">index_file</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">offset</span>
+        <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">letter</span> <span class="o">==</span> <span class="s1">&#39; &#39;</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">offset</span>
+</pre></div>
+
+
+<p>运行这个生成器函数，也能产生和原来相同的效果。</p>
+<div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/tmp/address.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="n">index_file</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">islice</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="mi">0</span> <span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">13</span><span class="p">]</span>
+</pre></div>
+
+
+<p>定义这种生成器函数的时候，唯一需要留意的就是：<strong>函数返回的那个迭代器，是有状态的，调用者不应该反复使用它。</strong></p>
+<p><strong>要点：</strong></p>
+<ul>
+<li>使用生成器比把收集到的结果放入列表里返回给调用者更加清晰；</li>
+<li>由生成器函数所返回的那个迭代器，可以把生成器函数体中，传给<code>yield</code>表达式的那些值，逐次产生出来；</li>
+<li>无论输入量有多大，生成器都能产生一系列输出，因为这些输入量和输出量，都不会影响它在执行时所消耗的内存。</li>
+</ul>
+<h4>第17条：在参数上面迭代时，要多加小心</h4>
+<p>举下面的例子，需要统计一个序列中每个元素占总和的百分比，为此所编写的标准化函数如下：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">numbers</span><span class="p">):</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">numbers</span><span class="p">:</span>   <span class="c1">#  Already exhausted</span>
+        <span class="n">percent</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">value</span> <span class="o">/</span> <span class="n">total</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">percent</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+
+<p>使用方法如下：</p>
+<div class="highlight"><pre><span></span><span class="n">visits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">80</span><span class="p">]</span>
+<span class="n">percentages</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">visits</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">percentages</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">61</span><span class="p">]</span>
+</pre></div>
+
+
+<p>为了扩大函数的使用范围，我们把数据写到文件里面，然后从该文件读取数据，我们定义了生成器函数来实现此功能，以便稍后把该函数重用到更为庞大的数据集上面。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">read_visits</span><span class="p">(</span><span class="n">data_path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+
+
+<p>但奇怪的是，以生成器所返回的那个迭代器为参数，来调用normalize，却没有产生任何结果。</p>
+<div class="highlight"><pre><span></span><span class="n">it</span> <span class="o">=</span> <span class="n">read_visits</span><span class="p">(</span><span class="s1">&#39;/tmp/my_numbers.txt&#39;</span><span class="p">)</span>
+<span class="n">percentages</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">visits</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">percentages</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="p">[]</span>
+</pre></div>
+
+
+<p>出现这种情况的原因在于，迭代器只能产生一轮结果。在抛出过<code>StopIteration</code>异常的迭代器或生成器上面继续迭代第二轮，是不会有结果的。</p>
+<div class="highlight"><pre><span></span><span class="n">it</span> <span class="o">=</span> <span class="n">read_visits</span><span class="p">(</span><span class="s1">&#39;/tmp/my_numbers.txt&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># Already exhausted</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">80</span><span class="p">]</span>
+<span class="p">[]</span>
+</pre></div>
+
+
+<p>为了解决此问题，我们可以明确地使用该迭代器制作一份列表，将它的全部内容都遍历一次，并复制到这份列表里，然后，就可以在复制出来的数据列表上面多次迭代了。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">normalize_copy</span><span class="p">(</span><span class="n">numbers</span><span class="p">):</span>
+    <span class="n">numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">numbers</span><span class="p">:</span>
+        <span class="n">percent</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">value</span> <span class="o">/</span> <span class="n">total</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">percent</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+
+<p>但是这种写法的问题在于，待复制的那个迭代器，可能含有大量输入数据，从而导致程序在复制迭代器的时候耗尽内存并崩溃。一种解决方法是通过参数来接受另外一个函数，那个函数每次调用后，都能返回新的迭代器。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">normalize_func</span><span class="p">(</span><span class="n">get_iter</span><span class="p">):</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">get_iter</span><span class="p">())</span>   <span class="c1"># New iterator</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">get_iter</span><span class="p">():</span>  <span class="c1"># New iterator</span>
+        <span class="n">percent</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">value</span> <span class="o">/</span> <span class="n">total</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">percent</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+
+<p>使用<code>normalize_fuc</code>函数的时候，可以传入<code>lambda</code>表达式，该表达式会调用生成器，以便每次都能产生新的迭代器。</p>
+<div class="highlight"><pre><span></span><span class="n">percentages</span> <span class="o">=</span> <span class="n">normalize_func</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">read_visits</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+</pre></div>
+
+
+<p>这种方法虽然没错，但是像上面这样传递<code>lambda</code>函数，毕竟显得生硬。还有个更好的方法，也能达成同样的效果，那就是新编一种实现迭代器协议的容器类。</p>
+<p>实际上，只需要令自己的类把<code>__iter__</code>方法实现为生成器，就能满足上述要求。如下：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ReadVisits</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_path</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+
+
+<p>用法如下：</p>
+<div class="highlight"><pre><span></span><span class="n">visits</span> <span class="o">=</span> <span class="n">ReadVisits</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="n">percentages</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">visits</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">percentages</span><span class="p">)</span>
+</pre></div>
+
+
+<p>明白了ReadVisits 这种容器的工作原理之后，我们可以修改原来编写的<code>normalize</code>函数，以确保调用者传进来的参数，并不是迭代器对象本身。迭代器协议有这样的约定：如果把迭代器对象传给内置的<code>iter</code>函数，那么此函数会把该迭代器返回，反之，如果传给<code>iter</code>函数的是个容器类型的对象，那么<code>iter</code>函数则每次都会返回新的迭代器对象。于是，我们可以根据<code>iter</code>函数的这种行为来判断输入值是不是迭代器对象本身，如果是，就抛出<code>TypeError</code>错误。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">normalize_defensive</span><span class="p">(</span><span class="n">numbers</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">iter</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">iter</span><span class="p">(</span><span class="n">numbers</span><span class="p">):</span>  <span class="c1"># An iterator -- bad!</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Must supply a container&#39;</span><span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">numbers</span><span class="p">:</span>
+        <span class="n">percent</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">value</span> <span class="o">/</span> <span class="n">total</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">percent</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+
+<p><strong>要点：</strong></p>
+<ul>
+<li>函数在输入的参数上面多次迭代是要当心：如果参数是迭代器，那么可能会导致奇怪的行为并错失某些值。</li>
+<li>Python 的迭代器协议，描述了容器和迭代器应该如何与iter 和next 内置函数，for 循环及相关表达式相互配合。</li>
+<li>把<code>`__iter__</code>方法实现为生成器，即可定义自己的容器类型。</li>
+<li>想判断某个值是迭代器还是容器，可以拿该值为参数，两次调用iter 函数，若结果相同，则是迭代器，调用内置的next 函数，即可令该迭代器前进一步。</li>
+</ul>
+<h4>第18条：用数量可变的位置参数减少视觉杂讯</h4>
+<p>令函数接受可选的位置参数（由于这种参数习惯上写为*args ，所以又称为star args，星号参数），能够使代码更加清晰，并能减少视觉杂讯。</p>
+<p>例子如下：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">):</span>  <span class="c1"># The only difference</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">value_str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">value_str</span><span class="p">))</span>
+</pre></div>
+
+
+<p>使用方法有好几种：</p>
+<div class="highlight"><pre><span></span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;My numbers are&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">log</span><span class="p">(</span><span class="s1">&#39;Hi there&#39;</span><span class="p">)</span>
+<span class="c1"># 如果要把已有的列表，传给像log 这样带有变长参数的函数，那么调用的时候，可以给列表前面加上*操作符。这样Python 就会把这个列表里的元素视为位置参数。</span>
+<span class="n">favorites</span> <span class="o">=</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">99</span><span class="p">]</span>
+<span class="n">log</span><span class="p">(</span><span class="s1">&#39;Favorites colors&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">favorites</span><span class="p">)</span>
+</pre></div>
+
+
+<p>这里有个问题，变长参数在传给函数时，总是要先转化成元组。这就意味着，如果用带有*操作符的生成器为参数，那么Python 就必须先把该生成器完整地迭代一轮，并把生成器所生成的每一个值，都放入元组之中。这可能会消耗大量内存，并导致程序崩溃。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_generator</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">i</span>
+
+<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+<span class="n">it</span> <span class="o">=</span> <span class="n">my_generator</span><span class="p">()</span>
+<span class="n">my_func</span><span class="p">(</span><span class="o">*</span><span class="n">it</span><span class="p">)</span>
+</pre></div>
+
+
+<p><strong>要点：</strong></p>
+<ul>
+<li>在<code>def</code>语句中使用<code>*args</code>，即可令函数接受数量可变的位置参数。</li>
+<li>调用函数时，可以采用*操作符，把序列中的元素当成位置参数，传给该函数。</li>
+<li>对生成器使用*操作符，可能导致程序耗尽内存并崩溃。</li>
+<li>在已经接受*args参数的函数上面继续添加位置参数，可能会产生难以排查的bug。</li>
+</ul>
+<h4>第19条：用关键字参数来表达可选的行为</h4>
+<p>例子：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">flow_rate</span><span class="p">(</span><span class="n">weight_diff</span><span class="p">,</span> <span class="n">time_diff</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">units_per_kg</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">weight_diff</span> <span class="o">*</span> <span class="n">units_per_kg</span><span class="p">)</span> <span class="o">/</span> <span class="n">time_diff</span><span class="p">)</span> <span class="o">*</span> <span class="n">period</span>
+</pre></div>
+
+
+<p>这种写法只有一个缺陷，那就是像period 和 units_per_kg 这种可选的关键字参数，仍然可以通过位置参数的形式来制定。</p>
+<div class="highlight"><pre><span></span><span class="n">pounds_per_hour</span> <span class="o">=</span> <span class="n">flow_rate</span><span class="p">(</span><span class="n">weight_diff</span><span class="p">,</span> <span class="n">time_diff</span><span class="p">,</span> <span class="mi">3600</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">)</span>
+</pre></div>
+
+
+<p>以位置参数的形式来指定可选参数，是容易令人困惑的，因为3600和2.2 这样的值，其含义并不清晰。最好的办法，是一直以关键字的形式来指定这些参数，而决不采用位置参数来指定它们。</p>
+<p><strong>要点：</strong></p>
+<ul>
+<li>函数参数可以按位置参数或关键字来指定；</li>
+<li>只使用位置参数来调用函数，可能会导致这些参数值得含义不够明确，而关键字参数则能够阐明每个参数的意图。</li>
+<li>给函数添加新的行为时，可以使用带默认值的关键字参数，以便与原有的函数调用代码保持兼容。</li>
+<li>可选的关键字参数，总是应该以关键字形式来指定，而不应该以位置参数的形式来指定。</li>
+</ul>
+<h4>第20条：用None 和文档字符串来描述具有动态默认值的参数</h4>
+<p>有时我们想要采用一种非静态的类型，来做关键字参数的默认值。例如，在打印日志消息的时候，要把相关事件的记录时间也标注在这条消息中。但是如果这样写会有问题：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">message</span><span class="p">))</span>
+
+<span class="n">log</span><span class="p">(</span><span class="s1">&#39;Hi there!&#39;</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">log</span><span class="p">(</span><span class="s1">&#39;Hi again!&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">16</span> <span class="mo">01</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">10.371432</span><span class="p">:</span> <span class="n">Hi</span> <span class="n">there</span><span class="err">!</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">16</span> <span class="mo">01</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mf">10.371432</span><span class="p">:</span> <span class="n">Hi</span> <span class="n">again</span><span class="err">!</span>
+</pre></div>
+
+
+<p>​        两条消息的时间戳是一样的，这是因为<code>datetime.now</code>只执行了一次，也就是它只在函数定义的时候执行了一次。参数的默认值，会在每个模块加载进来的时候求出，而很多模块都是在程序启动时加载的。包含这段代码的模块一旦加载进来，参数的默认值就固定不变了，程序不会再次执行<code>datetime.now</code>。</p>
+<p>​        在Python 中若想正确实现动态默认值，习惯上是把默认值设为None ，并在文档字符串里面把None 所对应的实际行为描述出来。编写函数代码时，如果发现该参数的值为None ，那就将其设为实际的默认值。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Log a message with a timestamp</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        message: Message to print.</span>
+<span class="sd">        when: datetime of when the message occured.</span>
+<span class="sd">            Defaults to the present time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">when</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="k">if</span> <span class="n">when</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">when</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">message</span><span class="p">))</span>
+</pre></div>
+
+
+<p>现在，两条消息的时间戳就不同了。</p>
+<div class="highlight"><pre><span></span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Hi there!&#39;</span><span class="p">)</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">log</span><span class="p">(</span><span class="s1">&#39;Hi again!&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">17</span> <span class="mi">12</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">00.472303</span><span class="p">:</span> <span class="n">Hi</span> <span class="n">there</span><span class="err">!</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">17</span> <span class="mi">12</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">00.572303</span><span class="p">:</span> <span class="n">Hi</span> <span class="n">again</span><span class="err">!</span>
+</pre></div>
+
+
+<p>字典的例子：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default</span>
+</pre></div>
+
+
+<p>修改成：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load JSON data from a string.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: JSON data to decode.</span>
+<span class="sd">        default: Value to return if decoding fails.</span>
+<span class="sd">            Defaults to an empty dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default</span>
+</pre></div>
+
+
+<p><strong>要点：</strong></p>
+<ul>
+<li>参数的默认值，只会在程序加载模块并读到本函数的定义是评估一次。对于{} 或[] 等动态的值，这可能会导致奇怪的行为。</li>
+<li>对于以动态值作为实际默认值的关键字参数来说，应该把形式上的默认值写为None ，并在函数的文档字符串里面描述该默认值所对应的实际行为。</li>
+</ul>
+<h4>第21条：用只能以关键字形式指定的参数来确保代码清晰</h4>
+<p>​        按关键字传递参数，是Python 函数的一项强大特性。由于关键字参数很灵活，所以在编写代码时，可以把函数的用法表达得更加明确。</p>
+<p>例如：要计算两数相除的结果，同时要对计算时的特殊情况进行小心的处理。有时我们想忽略<code>ZeroDivisionError</code>异常并返回无穷。有时又想忽略<code>OverflowError</code>异常并返回0。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">safe_division_b</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">ignore_overflow</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ignore_zero_division</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+</pre></div>
+
+
+<p>现在，调用者可以根据自己的具体需要，用关键字参数来覆盖<code>Boolean</code>标志的默认值，以便跳过相关的错误。</p>
+<div class="highlight"><pre><span></span><span class="n">safe_division_b</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">500</span><span class="p">,</span> <span class="n">ignore_overflow</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">safe_division_b</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ignore_zero_division</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+
+<p>​        上面这种写法还是有缺陷的。由于这些关键字参数都是可选的，所以没办法确保函数的调用者一定会使用关键字来明确指定这些参数的值。即便新定义的<code>safe_division_b</code>函数，也依然可以像原来那样，以位置参数的形式调用它。</p>
+<div class="highlight"><pre><span></span><span class="n">safe_division_b</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="mi">500</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
+
+<p>对于这种复杂的函数来说，最好是能够保证调用者必须以清晰的调用代码，来阐明调用该函数的意图。在Python3 中，可以定义一种只能以关键字形式来指定的参数，从而确保调用该函数的代码读起来会比较明确。这些参数必须以关键字的形式提供，而不能按位置提供。</p>
+<p>在Python3 的例子如下：</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">safe_division_c</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">divisor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> 
+                    <span class="n">ignore_overflow</span><span class="o">=</span><span class="n">Flase</span><span class="p">,</span> 
+                    <span class="n">ignore_zero_division</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+
+<span class="n">safe_division_c</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">500</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="ne">TypeError</span><span class="p">:</span> <span class="n">safe_division_c</span><span class="p">()</span> <span class="n">takes</span> <span class="mi">2</span> <span class="n">positional</span> <span class="n">arguments</span> <span class="n">buf</span> <span class="mi">4</span> <span class="n">were</span> <span class="n">given</span><span class="o">.</span>
+</pre></div>
+
+
+<p>关键字参数依然可以用关键字的形式来指定，如果不指定，也依然会采用默认值。</p>
+<div class="highlight"><pre><span></span><span class="n">safe_division_c</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ignore_zero_division</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c1"># OK</span>
+</pre></div>
+
+
+<p><strong>在Python 2 中实现只能以关键字来指定的参数</strong></p>
+<p>与Python3 不同，Python2 并没有明确的语法来定义这种只能以关键字形式指定的参数。不过，我们可以在参数列表中使用<strong> 操作符，并且令函数在遇到无效的调用时抛出<code>TypeErrors</code>，这样就可以实现与Python3 相同的功能了。 </strong> 操作符与 * 操作符类似，但区别在于，它不是用来接受数量可变的位置参数，而是用来接受任意数量的关键字参数。即便某些关键字参数没有定义在函数中，它也依然能够接受。</p>
+<div class="highlight"><pre><span></span><span class="c1"># Python 2</span>
+<span class="k">def</span> <span class="nf">print_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s1">&#39;Positional:&#39;</span><span class="p">,</span> <span class="n">args</span>
+    <span class="k">print</span> <span class="s1">&#39;Keyword:&#39;</span><span class="p">,</span> <span class="n">kwargs</span>
+
+<span class="n">print_args</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">stuff</span><span class="o">=</span><span class="s1">&#39;meep&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>为了使Python2 版本的<code>safe_division</code>函数具备只能以关键字形式指定的参数，我们可以先令该函数接受<code>**kwargs</code>参数，然后，用<code>pop</code>方法把期望的关键字参数是从<code>kwargs</code>字典里取走，如果字典的键里面没有那个关键字，那么<code>pop</code>方法的第二个参数就会成为默认值。最后，为了防止调用者提供无效的参数值，我们需要确认从<code>kwargs</code>字典里已经没有关键字参数了。</p>
+<div class="highlight"><pre><span></span><span class="c1"># Python 2</span>
+<span class="k">def</span> <span class="nf">safe_division_d</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">divisor</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ignore_overflow</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ignore_overflow&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+    <span class="n">ignore_zero_div</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ignore_zero_division&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unexpected **kwargs: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kwargs</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+</pre></div>
+
+
+<p><strong>要点：</strong></p>
+<ul>
+<li>关键字参数能够使函数调用的意图更加明确。</li>
+<li>对于各参数之间很容易混淆的函数，可以声明只能以关键字形式指定的参数，以确保调用者必须通过关键字来指定它们。对于接受多个Boolean标志的函数，更应该这样做。</li>
+<li>在编写函数时，Python3 有明确的语法来定义这种只能以关键字形式指定的参数。</li>
+<li>Python2 的函数可以接受**kwargs 参数，并手工抛出<code>TypeError</code>异常，以便模拟只能以关键字形式来指定的参数。</li>
+</ul>
+      </div>
+      <footer class="post-footer">
+        <div class="meta">
+          Article Categories: <a href="/category/python.html">python</a><br /> 
+          Author Articles: <a href="/author/sysublackbear.html">sysublackbear</a><br />
+          Article Tags:  #<a href="/tag/python.html">python</a>        </div>
+      </footer>
+      </article> <!-- /#page-main -->
+
+        <aside id="page-side">
+          <!-- begin includes/sidebar.html -->
+          <nav>
+            <h3>个人主页</h3>
+            <ul>
+              <li><a href="/categories.html">Categories</a></li>
+              <li><a href="/archives.html">Archives</a></li>
+              <li><a href="/tags.html">Tags</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h3>类别</h3>
+            <ul>
+              <li><a href="/category/about-me.html">about me</a></li>
+              <li><a href="/category/c.html">C++</a></li>
+              <li><a href="/category/code.html">code</a></li>
+              <li><a href="/category/jia-gou-mo-shi.html">架构模式</a></li>
+              <li><a href="/category/pelican.html">pelican</a></li>
+              <li class="active"><a href="/category/python.html">python</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h3>链接</h3>
+            <ul>
+              <li><a href="https://www.zhihu.com/people/sysublackbear">知乎</a></li>
+              <li><a href="http://www.cnblogs.com/sysu-blackbear">博客园</a></li>
+              <li><a href="http://weibo.com/sysublackbear?is_all=1">新浪微博</a></li>
+            </ul>
+          </nav>
+          <!-- end includes/sidebar.html --></aside> <!-- /#page-side -->
+      </div>  <!-- /#page-body -->
+
+      <footer id="page-foot">
+        <p> Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
+      </footer>
+    </div> <!-- /#page -->
+  </body>
+</html>
