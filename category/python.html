@@ -71,6 +71,46 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
         <header class="post-header">
           <h1>
             <a rel="bookmark"
+               href="/effective-python-chapter3zong-jie.html"
+               title="Lien permanent vers «《Effective Python》Chapter3总结»">
+               《Effective Python》Chapter3总结
+            </a>
+          </h1>
+          <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-11-09T00:42:00+08:00">三 09 十一月 2016</time><br />
+Categories: <a href="/category/python.html">python</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/python.html">python</a>          </div>
+        </header>
+        <div class="post-content"> 
+          <p>Chapter3 整理细节如下：</p>
+<h1>Chapter3.类与继承</h1>
+<h4>第22条：尽量用辅助类来维护程序的状态，而不要用字典和元组</h4>
+<p><strong>要点：</strong></p>
+<ul>
+<li>不要使用包含其他字典的字典，也不要使用过长的元组。</li>
+<li>如果容器中包含简单而又不可变的数据，那么可以先使用<code>namedtuple</code>来表示，待稍后有需要时，在修改为完整的类。</li>
+<li>保存内部状态的字典如果变得比较复杂，那就应该把这些代码<strong>拆解</strong>为多个辅助类。</li>
+</ul>
+<p>举个例子：本来记录每次学生考试的成绩的一个简单例子，由于不停地添加需求，比如增加记录此成绩占该科目总成绩的权重，等等，代码膨胀成如下这样：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">WeightedGradebook</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">add_student</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">report_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+        <span class="n">by_subject</span> <span class="o">=</span> <span class="bp">self ...</span></pre></div>
+        </div>
+        <footer class="post-footer">
+          <a class="readmore" href="/effective-python-chapter3zong-jie.html">Read more...</a>
+        </footer>
+      </article>
+      <article class="post">
+        <header class="post-header">
+          <h1>
+            <a rel="bookmark"
                href="/effective-python-chapter1zong-jie.html"
                title="Lien permanent vers «《Effective Python》Chapter1总结»">
                《Effective Python》Chapter1总结

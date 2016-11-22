@@ -71,6 +71,46 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
         <header class="post-header">
           <h1>
             <a rel="bookmark"
+               href="/effective-python-chapter3zong-jie.html"
+               title="Lien permanent vers «《Effective Python》Chapter3总结»">
+               《Effective Python》Chapter3总结
+            </a>
+          </h1>
+          <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-11-09T00:42:00+08:00">三 09 十一月 2016</time><br />
+Categories: <a href="/category/python.html">python</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/python.html">python</a>          </div>
+        </header>
+        <div class="post-content"> 
+          <p>Chapter3 整理细节如下：</p>
+<h1>Chapter3.类与继承</h1>
+<h4>第22条：尽量用辅助类来维护程序的状态，而不要用字典和元组</h4>
+<p><strong>要点：</strong></p>
+<ul>
+<li>不要使用包含其他字典的字典，也不要使用过长的元组。</li>
+<li>如果容器中包含简单而又不可变的数据，那么可以先使用<code>namedtuple</code>来表示，待稍后有需要时，在修改为完整的类。</li>
+<li>保存内部状态的字典如果变得比较复杂，那就应该把这些代码<strong>拆解</strong>为多个辅助类。</li>
+</ul>
+<p>举个例子：本来记录每次学生考试的成绩的一个简单例子，由于不停地添加需求，比如增加记录此成绩占该科目总成绩的权重，等等，代码膨胀成如下这样：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">WeightedGradebook</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">add_student</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">report_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+        <span class="n">by_subject</span> <span class="o">=</span> <span class="bp">self ...</span></pre></div>
+        </div>
+        <footer class="post-footer">
+          <a class="readmore" href="/effective-python-chapter3zong-jie.html">Read more...</a>
+        </footer>
+      </article>
+      <article class="post">
+        <header class="post-header">
+          <h1>
+            <a rel="bookmark"
                href="/effective-python-chapter1zong-jie.html"
                title="Lien permanent vers «《Effective Python》Chapter1总结»">
                《Effective Python》Chapter1总结
@@ -180,50 +220,6 @@ Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br 
         </div>
         <footer class="post-footer">
           <a class="readmore" href="/qi-ye-ying-yong-de-te-dian.html">Read more...</a>
-        </footer>
-      </article>
-      <article class="post">
-        <header class="post-header">
-          <h1>
-            <a rel="bookmark"
-               href="/effective-c-zhai-yao.html"
-               title="Lien permanent vers «《Effective C++》摘要»">
-               《Effective C++》摘要
-            </a>
-          </h1>
-          <div class="meta">
-<!-- includes/article_meta.html -->
-Date: <time datetime="2016-09-25T02:22:00+08:00">日 25 九月 2016</time><br />
-Categories: <a href="/category/c.html">C++</a><br />
-Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/c.html">C++</a>          </div>
-        </header>
-        <div class="post-content"> 
-          <p>看了下《Effective C++》这本书，整理了下面的一些摘要。</p>
-<h1>Chapter0.导读</h1>
-<h4>1.explict抑制隐式转换</h4>
-<p>例如：</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">B</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
-  <span class="k">explicit</span> <span class="n">B</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">b</span> <span class="o">=</span> <span class="nb">true</span><span class="p">);</span>   <span class="c1">//default构造函数，抑制隐私zh</span>
-<span class="p">}</span>
-</pre></div>
-
-
-<h4>2.理解拷贝构造和拷贝赋值的区别</h4>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Widget</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
-     <span class="n">Widget</span><span class="p">();</span>                                                   <span class="c1">//default构造函数</span>
-     <span class="n">Widget</span><span class="p">(</span><span class="k">const</span> <span class="n">Widget</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">);</span>                    <span class="c1">//copy构造函数</span>
-     <span class="n">Widget</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">Widget</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">);</span>  <span class="c1">//copy assignment操作符</span>
-     <span class="p">...</span>
-<span class="p">};</span>
-
-<span class="n">Widget</span> <span class="n">w1</span><span class="p">;</span>          <span class="c1">//调用default构造函数</span>
-<span class="n">Widget</span> <span class="n">w2</span><span class="p">;</span>          <span class="c1">//调用copy构造函数</span>
-<span class="n">w1</span> <span class="o">=</span> <span class="n">w2 ...</span></pre></div>
-        </div>
-        <footer class="post-footer">
-          <a class="readmore" href="/effective-c-zhai-yao.html">Read more...</a>
         </footer>
       </article>
       <nav id="pagination">   <!-- <span id="first_page" class="a inactive">&#60;&#60;</span>

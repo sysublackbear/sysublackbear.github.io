@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+        <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=endge, chrome=IE8" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no" />
+    <title>《Effective Python》Chapter3总结 — /usr/bin/sysublackbear</title>
+    <!--[if lte IE 8]><script type="text/javascript" src="/theme/js/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" type="text/css" href="/theme/css/skeleton.css" />
+    <link rel="stylesheet" type="text/css" href="/theme/css/theme.css" />
+    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <!--[if lte IE 8]><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" /><![endif]-->
+    <link rel="alternate" type="application/atom+xml"
+                           title="/usr/bin/sysublackbear — Flux Atom"
+                           href="/" /> 
+
+    <meta name="author"   content="sysublackbear" />
+    <meta name="keywords" content="python" />
+    <link rel="stylesheet" media="not print" type="text/css" href="/theme/css/pygments.css" /> 
+  </head>
+  <body>
+    <div id="page">
+      <header id="page-head">
+        <h1>
+          <a href="/index.html">/usr/bin/sysublackbear</a>
+        </h1>
+      </header>
+      
+      <div id="page-body">
+        <article class="post" id="page-main" role="main">
+      <header class="post-header">
+        <h1>
+          <a rel="bookmark"
+             href="/effective-python-chapter3zong-jie.html"
+             title="Lien permanent vers «《Effective Python》Chapter3总结»">
+             《Effective Python》Chapter3总结
+          </a>
+        </h1>
+        <div class="meta">
+<!-- includes/article_meta.html -->
+Date: <time datetime="2016-11-09T00:42:00+08:00">三 09 十一月 2016</time><br />
+Categories: <a href="/category/python.html">python</a><br />
+Author: <a href="/author/sysublackbear.html">sysublackbear</a>              <br />Tags:              <a rel="tag" href="/tag/python.html">python</a>        </div>
+      </header>
+      <div class="post-content"> 
+        <p>Chapter3 整理细节如下：</p>
+<h1>Chapter3.类与继承</h1>
+<h4>第22条：尽量用辅助类来维护程序的状态，而不要用字典和元组</h4>
+<p><strong>要点：</strong></p>
+<ul>
+<li>不要使用包含其他字典的字典，也不要使用过长的元组。</li>
+<li>如果容器中包含简单而又不可变的数据，那么可以先使用<code>namedtuple</code>来表示，待稍后有需要时，在修改为完整的类。</li>
+<li>保存内部状态的字典如果变得比较复杂，那就应该把这些代码<strong>拆解</strong>为多个辅助类。</li>
+</ul>
+<p>举个例子：本来记录每次学生考试的成绩的一个简单例子，由于不停地添加需求，比如增加记录此成绩占该科目总成绩的权重，等等，代码膨胀成如下这样：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">WeightedGradebook</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">add_student</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">report_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+        <span class="n">by_subject</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">grade_list</span> <span class="o">=</span> <span class="n">by_subject</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">grade_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">score</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">average_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">by_subject</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">score_sum</span><span class="p">,</span> <span class="n">score_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">subject</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">by_subject</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">subject_avg</span><span class="p">,</span> <span class="n">total_weight</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">score</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">:</span>
+                <span class="c1"># ...</span>
+        <span class="k">return</span> <span class="n">score_sum</span> <span class="o">/</span> <span class="n">score_count</span>
+</pre></div>
+
+
+<p>现在代码已经变得如此复杂了，那么我们就该从字典和元组迁移到类体系了。</p>
+<p>与字典嵌套层级逐渐变深一样，元组长度逐步扩张，也意味着代码逐渐趋复杂。元组里的元素一旦超过两项，就应该考虑用其他办法来实现了。</p>
+<p><code>collections</code>模块中的<code>namedtuple</code>（具名元组）类型非常适合实现这种需求。它很容易就能定义出精简而又不可变的数据类。</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">collections</span>
+<span class="n">Grade</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Grade&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">))</span>
+</pre></div>
+
+
+<p>接下来编写表示科目的类，该类包含一系列考试成绩。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Subject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">report_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Grade</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">average_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">total</span><span class="p">,</span> <span class="n">total_weight</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">grade</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grades</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">grade</span><span class="o">.</span><span class="n">score</span> <span class="o">*</span> <span class="n">grade</span><span class="o">.</span><span class="n">weight</span>
+            <span class="n">total_weight</span> <span class="o">=</span> <span class="o">+=</span> <span class="n">grade</span><span class="o">.</span><span class="n">weight</span>
+        <span class="k">return</span> <span class="n">total</span> <span class="o">/</span> <span class="n">total_weight</span>
+</pre></div>
+
+
+<p>然后，可以编写表示学生的类，该类包含此学生正在学习的各项课程。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subjects</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">subject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subjects</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subjects</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Subject</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subjects</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">average_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">total</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subjects</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">subject</span><span class="o">.</span><span class="n">average_grade</span><span class="p">()</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">total</span> <span class="o">/</span> <span class="n">count</span>
+</pre></div>
+
+
+<p>最后，编写包含所有学生考试成绩的容器类，该容器以学生的名字为键，并且可以动态地添加学生。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Gradebook</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_students</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">student</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span><span class="n">s</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_students</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_students</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Student</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_students</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</pre></div>
+
+
+<p>这些类的代码量，基本上是刚才那种实现方式的两倍。但这种程序理解起来要比原来容易许多，而且使用这些类的范例代码写起来也比原来更清晰，更易扩展。</p>
+<h4>第23条：简单的接口应该接受函数，而不是类的实例</h4>
+<p><strong>要点：</strong></p>
+<ul>
+<li>对于连接各种Python 组件的简单接口来说，通常应该给其直接传入函数，而不是先定义某个类，然后再传入该类的实例。</li>
+<li>Python 中的函数和方法都可以像一级类那样引用，因此，它们与其他类型的对象一样，也能够放在表达式里面。</li>
+</ul>
+<p>在Python 中，很多挂钩只是无状态的函数，这些函数有明确的参数及返回值。用函数做挂钩是比较合适的，因为它们很容易就能描述这个挂钩的功能，而且比定义一个类要简单。Python 中的函数之所以能充当挂钩，原因就在于，它是一级对象，也就是说，函数与方法可以像语言中的其他值那样传递和引用。</p>
+<p>例如，现在要给defaultdict 传入一个产生默认值得挂钩，并令其统计出该字典一共遇到了多少个缺失的键。一种实现方式是使用带状态的闭包。</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">increment_with_report</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">increments</span><span class="p">):</span>
+    <span class="n">added_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">missing</span><span class="p">():</span>
+        <span class="n">nonlocal</span> <span class="n">added_count</span>  <span class="c1"># Stateful closure</span>
+        <span class="n">added_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">increments</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">amount</span>
+
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">added_count</span>
+</pre></div>
+
+
+<p>类方法实现：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CountMissing</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">added</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">added</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<span class="c1"># 调用</span>
+<span class="n">counter</span> <span class="o">=</span> <span class="n">CountMissing</span><span class="p">()</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">counter</span><span class="o">.</span><span class="n">misssing</span><span class="p">,</span> <span class="n">currents</span><span class="p">)</span>  <span class="c1"># Method ref </span>
+
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">increments</span><span class="p">:</span>
+    <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="o">+=</span> <span class="n">amount</span>
+<span class="k">assert</span> <span class="n">counter</span><span class="o">.</span><span class="n">added</span> <span class="o">==</span> <span class="mi">2</span>
+</pre></div>
+
+
+<ul>
+<li>通过名<code>__call</code>的特殊方法，可以使类的实例能够像普通的Python 函数那样得到调用。</li>
+</ul>
+<p>但是上面类方法实现的功能有点鸡肋，可读性不高。为了理清这些问题，我们可以在Python 代码中定义名为<code>__call__</code>的特殊方法。该方法使相关对象能够像函数那样得到调用。此外，如果把这样的实例传给内置的<code>callable</code>函数，那么<code>callable</code>函数会返回True。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BetterCountMissing</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">added</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">added</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<span class="n">counter</span> <span class="o">=</span> <span class="n">BetterCountMissing</span><span class="p">()</span>
+<span class="n">counter</span><span class="p">()</span>
+<span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+
+<span class="c1"># 调用</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>  <span class="c1"># Relies on __call__</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">increments</span><span class="p">:</span>
+    <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">amount</span> 
+<span class="k">assert</span> <span class="n">counter</span><span class="o">.</span><span class="n">added</span> <span class="o">==</span> <span class="mi">2</span>
+</pre></div>
+
+
+<p>由此得到最后一点：</p>
+<ul>
+<li>如果要用函数来保存状态，那就应该定义新的类，并令其实现<code>__call__</code>方法，而不要定义带状态的闭包。</li>
+</ul>
+<h4>第24条：以@classmethod 形式的多态去通用地构建对象</h4>
+<p><strong>要点：</strong></p>
+<ul>
+<li>在Python 程序中，每个类只能有一个构造器，也就是<code>__init__</code>方法。</li>
+<li>通过<code>@classmethod</code>机制，可以用一种与构造器相仿的方式来构造类的对象。</li>
+<li>通过类方法多态机制，我们能够以更加通用的方式来构建并拼接具体的子类。</li>
+</ul>
+<p>例子，我们想要实现一套MapReduce 流程，我们需要定义公共基类来表示输入的数据。如下：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">InputData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span><span class="n">s</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+<span class="k">class</span> <span class="nc">PathInputData</span><span class="p">(</span><span class="n">InputData</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="c1"># 定义工作线程</span>
+<span class="k">class</span> <span class="nc">Worker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+<span class="k">class</span> <span class="nc">LineCountWorker</span><span class="p">(</span><span class="n">Worker</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_data</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">+=</span> <span class="n">other</span><span class="o">.</span><span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">generate_input</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">PathInputData</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">create_workers</span><span class="p">(</span><span class="n">input_list</span><span class="p">):</span>
+    <span class="n">workers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">input_data</span> <span class="ow">in</span> <span class="n">input_list</span><span class="p">:</span>
+        <span class="n">workers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LineCountWorker</span><span class="p">(</span><span class="n">input_data</span><span class="p">))</span>
+    <span class="k">return</span>  <span class="n">workers</span>
+
+<span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">workers</span><span class="p">):</span>
+    <span class="n">threads</span> <span class="o">=</span> <span class="p">[</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">map</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">workers</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span> <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span> <span class="n">thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="n">first</span><span class="p">,</span> <span class="n">rest</span> <span class="o">=</span> <span class="n">workers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">workers</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">for</span> <span class="n">worker</span> <span class="ow">in</span> <span class="n">rest</span><span class="p">:</span>
+        <span class="n">first</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">worker</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">first</span><span class="o">.</span><span class="n">result</span>
+
+<span class="c1"># 最后，拼装函数</span>
+<span class="k">def</span> <span class="nf">mapreduce</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">generate_inputs</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="n">workers</span> <span class="o">=</span> <span class="n">create_workers</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">execute</span><span class="p">(</span><span class="n">workers</span><span class="p">)</span>
+</pre></div>
+
+
+<p>但是，上面这种写法有个大问题，那就是MapReduce 函数不够通用。如果要编写其他的InputData 或 Worker 子类，那就得重写 generate_inputs, create_workers 和 mapreduce 函数，以便与之匹配。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">GenericInputData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">generate_inputs</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+<span class="k">class</span> <span class="nc">PathInputData</span><span class="p">(</span><span class="n">GenericInputData</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">generate_inputs</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;data_dir&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">cls</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">GenericWorker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_workers</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">input_class</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="n">workers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">input_data</span> <span class="ow">in</span> <span class="n">input_class</span><span class="o">.</span><span class="n">generate_inputs</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+            <span class="n">workers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cls</span><span class="p">(</span><span class="n">input_data</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">workers</span>
+
+<span class="k">class</span> <span class="nc">LineCountWorker</span><span class="p">(</span><span class="n">GenericWorker</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+<span class="c1"># 最后，重写mapreduce函数，令其变得完全通用。</span>
+<span class="k">def</span> <span class="nf">mapreduce</span><span class="p">(</span><span class="n">worker_cls</span><span class="p">,</span> <span class="n">input_class</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">workers</span> <span class="o">=</span> <span class="n">worker_cls</span><span class="o">.</span><span class="n">create_workers</span><span class="p">(</span><span class="n">input_class</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">execute</span><span class="p">(</span><span class="n">workers</span><span class="p">)</span>
+</pre></div>
+
+
+<h4>第25条：用super 初始化父类</h4>
+<p><strong>要点：</strong></p>
+<ul>
+<li>Python 采用标准的方法解析顺序来解决超类初始化次序及钻石继承问题。</li>
+</ul>
+<p>在Python2 里面，我们使用内置的super 函数，并且定义了方法解析顺序（MRO），MRO以标准的流程来安排超类之间的初始化顺序，它也保证钻石顶部那个公共基类的<code>__init__</code>方法只会运行一次。</p>
+<div class="highlight"><pre><span></span><span class="c1"># Python 2 </span>
+<span class="k">class</span> <span class="nc">TimesFiveCorrect</span><span class="p">(</span><span class="n">MyBaseClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TimesFiveCorrect</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="mi">5</span>
+
+<span class="k">class</span> <span class="nc">PlusTwoCorrect</span><span class="p">(</span><span class="n">MyBaseClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">supper</span><span class="p">(</span><span class="n">PlusTwoCorrect</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">2</span>
+</pre></div>
+
+
+<p>现在，对于处在钻石顶部的那个MyBaseClass 类来说，它的<code>__init__</code>方法只会运行一次。而其他超类的初始化顺序，则与这些超类在class 语句中出现的顺序相同。</p>
+<div class="highlight"><pre><span></span><span class="c1"># Python 2</span>
+<span class="k">class</span> <span class="nc">GoodWay</span><span class="p">(</span><span class="n">TimesFiveCorrect</span><span class="p">,</span> <span class="n">PlusTwoCorrect</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GoodWay</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+
+
+<p>查看MRO 顺序可以通过名为mro 的类方法来查询。</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">GoodWay</span><span class="o">.</span><span class="n">mro</span><span class="p">())</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="p">[</span><span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">__main__</span><span class="o">.</span><span class="n">GoodWay</span><span class="s1">&#39;&gt;, &lt;class &#39;</span><span class="n">__main__</span><span class="o">.</span><span class="n">TimesFiveCorrect</span><span class="s1">&#39;&gt;,</span>
+ <span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">__main__</span><span class="o">.</span><span class="n">PlusTwoCorrect</span><span class="o">&gt;</span><span class="s1">&#39;, &lt;class &#39;</span><span class="n">__main__</span><span class="o">.</span><span class="n">MyBaseClass</span><span class="s1">&#39;&gt;, &lt;class &#39;</span><span class="nb">object</span><span class="s1">&#39;&gt;]</span>
+</pre></div>
+
+
+<p>对于Python 2 调用super时，必须写出当前类的名称。Python 3 则没有这些问题，因为它提供了一种不带参数的super 调用方式，该方式的效果与用<code>__class__</code>和self 来调用super 相同。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Explicit</span><span class="p">(</span><span class="n">MyBaseClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Implicit</span><span class="p">(</span><span class="n">MyBaseClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+
+<p>注：Python 2 没有定义<code>__class__</code>。</p>
+<h4>第26条：只在使用Mix-in 组件制作工具类时进行多重继承</h4>
+<p>Python 是面向对象的编程语言，它提供了一些内置的编程机制，使得开发者可以适当地实现多重继承。但是，我们仍然应该尽量避开多重继承。</p>
+<p>若一定要利用多重继承所带来的便利及封装性，那就考虑编写mix-in 类。mix-in 是一种小型的类，它只定义了其他类可能需要提供的一套附加方法，而不定义自己的实例属性，此外，它也不要求使用者调用自己的<code>__init__</code>构造器。</p>
+<p>举个例子，下列代码定义了实现该功能所用的mix-in 类，并在其中添加了一个新的public 方法，使其他类可以通过继承这个mix-in 类来具备此功能：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ToDictMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_traverse_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+
+    <span class="c1"># 具体的实现代码写起来也很直观：我们只需要用hasattr 函数动态地访问属性，用isinstance 函数动态地检测对象类型，并用__dict__ 来访问实例内部的字典即可。</span>
+    <span class="k">def</span> <span class="nf">_traverse_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_dict</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">instance_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_traverse</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+    <span class="k">def</span> <span class="nf">_traverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ToDictMixin</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_traverse_dict</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_traverse</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;__dict__&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_traverse_dict</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+</pre></div>
+
+
+<p>下面定义的这个类演示了如何用mix-in 把二叉树表示为字典：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BinaryTree</span><span class="p">(</span><span class="n">ToDictMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
+
+<span class="c1"># 使用</span>
+<span class="n">tree</span> <span class="o">=</span> <span class="n">BinaryTree</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> 
+                  <span class="n">left</span><span class="o">=</span><span class="n">BinaryTree</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">BinaryTree</span><span class="p">(</span><span class="mi">9</span><span class="p">)),</span>
+                  <span class="n">right</span><span class="o">=</span><span class="n">BinaryTree</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">BinaryTree</span><span class="p">(</span><span class="mi">11</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+</pre></div>
+
+
+<p>多个mix-in 之间也可以相互结合。例如，我们要提供通用的JSON 序列化功能。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">JsonMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+</pre></div>
+
+
+<p>那么继承多种的拓扑结构：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DatacenterRack</span><span class="p">(</span><span class="n">ToDictMixin</span><span class="p">,</span> <span class="n">JsonMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">switch</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">machines</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">switch</span> <span class="o">=</span> <span class="n">Switch</span><span class="p">(</span><span class="o">**</span><span class="n">switch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machines</span> <span class="o">=</span> <span class="p">[</span>
+          <span class="n">Machine</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">machines</span>
+        <span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">Switch</span><span class="p">(</span><span class="n">ToDictMixin</span><span class="p">,</span> <span class="n">JsonMixin</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+
+<span class="k">class</span> <span class="nc">Machine</span><span class="p">(</span><span class="n">ToDictMixin</span><span class="p">,</span> <span class="n">JsonMixin</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+</pre></div>
+
+
+<p><strong>要点：</strong></p>
+<ul>
+<li>能用<code>mix-in</code>组件实现的效果，就不要用多重继承来做。</li>
+<li>将各功能实现为<strong>可插拨</strong>的mix-in 组件，然后令相关的类继承自己需要的那些组件，即可定制该类实例所应具备的行为。</li>
+<li>把简单的行为封装到mix-in 组件里，然后就可以用多个mix-in 组合出复杂的行为了。</li>
+</ul>
+<h4>第27条：多用 public 属性，少用 private 属性</h4>
+<p>对Python 类来说，其属性的可见度只有两种，也就是 public （公开的，公共的）和 private （私密的，私有的）：</p>
+<p>由于类级别的方法仍然声明在本类的 class 代码块之内，所以，这些方法也是能够访问 private 属性的。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">public_field</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__private_field</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">def</span> <span class="nf">get_private_field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_field</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_private_field_of_instance</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">instance</span><span class="o">.</span><span class="n">__private_field</span>
+</pre></div>
+
+
+<p>正如大家所料，子类无法访问父类的 private 字段。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyParentObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__private_field</span> <span class="o">=</span> <span class="mi">71</span>
+
+<span class="k">class</span> <span class="nc">MyChildObject</span><span class="p">(</span><span class="n">MyParentObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_private_field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__private_field</span>
+
+<span class="n">baz</span> <span class="o">=</span> <span class="n">MyChildObject</span><span class="p">()</span>
+<span class="n">baz</span><span class="o">.</span><span class="n">get_private_field</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="ne">AttributeError</span><span class="p">:</span> <span class="s1">&#39;MyChildObject&#39;</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span>
+<span class="s1">&#39;_MyChildObject__private_field&#39;</span>
+</pre></div>
+
+
+<p><strong>private</strong>属性的根本原理：</p>
+<ul>
+<li>Python 编译器无法严格保证private 字段的私密性。转而以以下机制来保证private 属性。</li>
+</ul>
+<p>Python 会对私有属性的名称做一些简单的变换，以保证private 字段的私密性。当编译器看到 <code>MyChildObject.get_private_field</code> 方法要访问私有属性时，它会先把 <code>__private_field</code> 变换为<code>_MyChildObject__private_field</code>，然后再进行访问。本例中，<code>__private_field</code>字段只在<code>MyParentObject.__init__</code>里面做了定义。因此，这个私有属性的真实名称，实际上是<code>_MyParentObject__private_field</code>。子类之所以无法访问父类的私有属性，只不过是因为变换后的属性名与待访问的属性名不相符而已。</p>
+<p>了解这套机制之后，我们就可以从任意类中访问相关类的私有属性了。无论是从该类的子类访问，还是从外部访问，我们都不受制于private 属性的访问权限。</p>
+<div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">baz</span><span class="o">.</span><span class="n">_MyParentObject__private_field</span> <span class="o">==</span> <span class="mi">71</span>
+</pre></div>
+
+
+<p>查询该对象的属性字典，我们就能看到，私有属性实际上是按变换后的名称来保存的。</p>
+<div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">baz</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span>
+<span class="p">{</span><span class="s1">&#39;_MyParentObject__private_field&#39;</span><span class="p">:</span> <span class="mi">71</span><span class="p">}</span>
+</pre></div>
+
+
+<p>Python 为什么不从语法上严格保证 private 字段的私密性呢？用最简单的话来说，就是：We are all consenting adults here. 这句广为流传的格言，表达了很多Python 程序员的观点，大家都认为开放要比封闭好。</p>
+<p>另外一个原因在于：Python 语言本身就已经提供了一些属性挂钩，使得开发者能够按照自己的需要来操作对象内部的数据。</p>
+<ul>
+<li>不要盲目地将属性设为private ，而是应该从一开始就做好规划，并允许子类更多地访问超类的内部API。</li>
+</ul>
+<p>举个例子：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span>
+
+<span class="n">foo</span> <span class="o">=</span> <span class="n">MyClass</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">foo</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;5&#39;</span>
+
+<span class="c1"># 子类只能通过该方法访问父类的变量</span>
+<span class="k">class</span> <span class="nc">MyIntegerSubClass</span><span class="p">(</span><span class="n">MyClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_MyClass__value</span><span class="p">)</span>
+
+<span class="n">foo</span> <span class="o">=</span> <span class="n">MyIntegerSubClass</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">foo</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="mi">5</span>
+</pre></div>
+
+
+<p>可是，一旦子类后面的那套继承体系发生变化，这些对private 字段的引用代码就会傻逼了，从而导致子类出现错误：</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyBaseClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="c1"># ...</span>
+
+<span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="n">MyBaseClass</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+<span class="k">class</span> <span class="nc">MyIntegerSubClass</span><span class="p">(</span><span class="n">MyClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_MyClass__value</span><span class="p">)</span>
+</pre></div>
+
+
+<p>因此，恰当的做法：宁可叫子类更多地访问超类的 protected 属性，也别把这些属性设成private 。我们应该在文档中说明每个protected 字段的含义，解释哪些字段是可供子类使用的内部API，哪些字段是完全不应该触碰的数据。这种建议信息，不仅可以给其他程序员看，而且也能在将来扩展代码的时候提醒自己，应该如何保证数据安全。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># 文档内容：定义_value为protected属性，方便子类访问</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+</pre></div>
+
+
+<p>由此，可得：</p>
+<ul>
+<li>应该多用protected 属性，并在文档中把这些字段的合理用法告诉子类的开发者，而不要试图用private 属性来限制子类访问这些字段。</li>
+</ul>
+<p>只有一种情况是可以合理使用private 属性的，那就是用它来避免子类的属性名与超类相冲突。如果子类无意中定义了与超类同名的属性，那么程序就可能出问题。</p>
+<ul>
+<li>只有当子类不受自己控制时，才可以考虑用private 属性来避免名称冲突。即子类的开发者和基类的开发者不是同一个人的时候。</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ApiClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span>
+
+<span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">ApiClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>  <span class="c1"># OK!</span>
+</pre></div>
+
+
+<h4>第28条：继承 collections.abc 以实现自定义的容器类型</h4>
+<p><strong>要点：</strong></p>
+<ul>
+<li>如果要定制的子类比较简单，那就可以直接从 Python 的容器类型（如 list 或 dict）中继承。</li>
+</ul>
+<p>例如，要创建一种自定义的列表类型，并提供统计各元素出现频率的方法。</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FrequencyList</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">members</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">members</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">counts</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+
+
+<ul>
+<li>想正确实现自定义的容器类型，可能需要编写大量的特殊方法。</li>
+<li>编写自制的容器类型时，可以从 collections.abc 模块的抽象基类中继承，那些基类能够确保我们的子类具备恰当的接口及行为。</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
+
+<span class="k">class</span> <span class="nc">BadType</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="n">foo</span> <span class="o">=</span> <span class="n">BadType</span><span class="p">()</span>
+
+<span class="o">&gt;&gt;&gt;</span>
+<span class="ne">TypeError</span><span class="p">:</span> <span class="n">Can</span><span class="s1">&#39;t instantiate abstract class BadType with abstract methods __getitem__, __len__</span>
+</pre></div>
+
+
+<p>如果子类已经实现了抽象基类所要求的每个方法，那么基类就会自动提供剩下的那些方法。比如index 和 count 方法实现后之后，其他方法自动会生成。主要方法有<code>__len__</code>和<code>__getitem__</code>。</p>
+      </div>
+      <footer class="post-footer">
+        <div class="meta">
+          Article Categories: <a href="/category/python.html">python</a><br /> 
+          Author Articles: <a href="/author/sysublackbear.html">sysublackbear</a><br />
+          Article Tags:  #<a href="/tag/python.html">python</a>        </div>
+      </footer>
+      </article> <!-- /#page-main -->
+
+        <aside id="page-side">
+          <!-- begin includes/sidebar.html -->
+          <nav>
+            <h3>个人主页</h3>
+            <ul>
+              <li><a href="/categories.html">Categories</a></li>
+              <li><a href="/archives.html">Archives</a></li>
+              <li><a href="/tags.html">Tags</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h3>类别</h3>
+            <ul>
+              <li><a href="/category/about-me.html">about me</a></li>
+              <li><a href="/category/c.html">C++</a></li>
+              <li><a href="/category/code.html">code</a></li>
+              <li><a href="/category/jia-gou-mo-shi.html">架构模式</a></li>
+              <li><a href="/category/pelican.html">pelican</a></li>
+              <li class="active"><a href="/category/python.html">python</a></li>
+            </ul>
+          </nav>
+
+          <nav>
+            <h3>链接</h3>
+            <ul>
+              <li><a href="https://www.zhihu.com/people/sysublackbear">知乎</a></li>
+              <li><a href="http://www.cnblogs.com/sysu-blackbear">博客园</a></li>
+              <li><a href="http://weibo.com/sysublackbear?is_all=1">新浪微博</a></li>
+            </ul>
+          </nav>
+          <!-- end includes/sidebar.html --></aside> <!-- /#page-side -->
+      </div>  <!-- /#page-body -->
+
+      <footer id="page-foot">
+        <p> Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
+      </footer>
+    </div> <!-- /#page -->
+  </body>
+</html>
